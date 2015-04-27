@@ -4,6 +4,6 @@ type EndModel struct {
 	NodeModel
 }
 
-func (p *EndModel) EndHandle(execution Execution) error {
+func (p *EndModel) EndHandle(execution Execution) {
 
 }

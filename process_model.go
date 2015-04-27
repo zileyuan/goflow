@@ -24,3 +24,8 @@ func (p *ProcessModel) GetStart() *StartModel {
 	}
 	return nil
 }
+
+func (p *ProcessModel) GetNode(name string) INodeModel {
+	//todo
+	return nil
+}

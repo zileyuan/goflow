@@ -12,12 +12,12 @@ type TaskModel struct {
 	ExpireTime  time.Time    ``                       //期望完成时间
 }
 
-func (p *TaskModel) CreateHandle(execution *Execution) error {
+func (p *TaskModel) CreateHandle(execution *Execution) {
 	tasks := execution.Engine.taskService.CreateTask(p, execution)
 	execution.AddTasks(tasks)
 }
 
-func (p *TaskModel) MergeActorHandle(execution *Execution) error {
+func (p *TaskModel) MergeActorHandle(execution *Execution) {
 
 }
 

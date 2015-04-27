@@ -4,6 +4,6 @@ type JoinModel struct {
 	NodeModel
 }
 
-func (p *JoinModel) MergeBranchHandler(execution Execution) error {
+func (p *JoinModel) MergeBranchHandler(execution Execution) {
 
 }

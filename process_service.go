@@ -3,7 +3,6 @@ package goflow
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"time"
 
 	"github.com/lunny/log"
@@ -35,15 +34,6 @@ func (p *ProcessService) Cache(process *Process) {
 	processName = process.Name + DEFAULT_SEPARATOR + IntString(process.Version)
 	p.ProcessCache[processName] = process
 	p.NameCache[process.Id] = processName
-}
-
-func (p *ProcessService) LoadXML(xmlProcess string) []byte {
-	content, err := ioutil.ReadFile(xmlProcess)
-	if err != nil {
-		log.Errorf("error to read xml file %v", err)
-		panic(fmt.Errorf("error to read xml file!"))
-	}
-	return content
 }
 
 func (p *ProcessService) Deploy(input []byte, creator string) string {

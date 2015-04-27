@@ -16,3 +16,7 @@ type Execution struct {
 func (p *Execution) AddTasks(tasks []*Task) {
 	p.Tasks = append(p.Tasks, tasks...)
 }
+
+func (p *Execution) AddTask(tasks *Task) {
+	p.Tasks = append(p.Tasks, tasks)
+}
