@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process displayName="测试简单流程" name="simple">
+<process displayName="测试子流程" name="child">
     <start displayName="start1" name="start1">
         <transition name="transition1" to="task1"/>
     </start>

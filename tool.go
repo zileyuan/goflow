@@ -8,7 +8,7 @@ import (
 	"github.com/lunny/log"
 )
 
-func ParseInt(value string) int {
+func StrToInt(value string) int {
 	if value == "" {
 		return 0
 	}
@@ -16,7 +16,7 @@ func ParseInt(value string) int {
 	return val
 }
 
-func IntString(value int) string {
+func IntToStr(value int) string {
 	return strconv.Itoa(value)
 }
 

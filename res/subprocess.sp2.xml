@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process displayName="测试并行子流程" name="sp2">
+    <start displayName="start1" name="start1">
+        <transition name="transition1" to="fork1"/>
+    </start>
+    <end displayName="end1" name="end1"/>
+    <subprocess displayName="subprocess1" name="subprocess1" processName="child">
+        <transition name="transition3" to="join1"/>
+    </subprocess>
+    <subprocess displayName="subprocess2" name="subprocess2" processName="child">
+        <transition name="transition4" to="join1"/>
+    </subprocess>
+    <fork displayName="fork1" name="fork1">
+        <transition name="transition5" to="subprocess2"/>
+        <transition name="transition6" to="subprocess1"/>
+    </fork>
+    <join displayName="join1" name="join1">
+        <transition name="transition2" to="end1"/>
+    </join>
+</process>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process displayName="测试分支合并" name="forkjoin">
+    <start displayName="start1" name="start1">
+        <transition name="transition1" to="fork1"/>
+    </start>
+    <end displayName="end1" name="end1"/>
+    <fork displayName="fork1" name="fork1">
+        <transition name="transition3" to="task1"/>
+        <transition name="transition4" to="task2"/>
+        <transition name="transition5" to="task3"/>
+    </fork>
+    <join displayName="join1" name="join1">
+        <transition name="transition2" to="end1"/>
+    </join>
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+        <transition name="transition6" to="join1"/>
+    </task>
+    <task assignee="task2.operator" displayName="task2" name="task2" performType="ANY">
+        <transition name="transition7" to="join2"/>
+    </task>
+    <task assignee="task3.operator" displayName="task3" name="task3" performType="ANY">
+        <transition name="transition8" to="join2"/>
+    </task>
+    <join displayName="join2" name="join2">
+        <transition name="transition9" to="join1"/>
+    </join>
+</process>

@@ -30,7 +30,7 @@ func (p *OrderService) SaveOrder(order *Order) {
 	historyOrder.Save()
 }
 
-func (p *OrderService) Complete(id string) {
+func (p *OrderService) CompleteOrder(id string) {
 	order := new(Order)
 	order.GetOrderById(id)
 
@@ -42,7 +42,7 @@ func (p *OrderService) Complete(id string) {
 	order.Delete()
 }
 
-func (p *OrderService) Resume(id string) {
+func (p *OrderService) ResumeOrder(id string) {
 	historyOrder := new(HistoryOrder)
 	historyOrder.GetHistoryOrderById(id)
 	historyOrder.OrderState = FS_ACTIVITY
@@ -53,6 +53,6 @@ func (p *OrderService) Resume(id string) {
 
 }
 
-func (p *OrderService) Terminate(id string, operator string) {
+func (p *OrderService) TerminateOrder(id string, operator string) {
 
 }

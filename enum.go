@@ -1,5 +1,9 @@
 package goflow
 
+const (
+	DEFAULT_SEPARATOR = "." //默认分割符
+)
+
 //流程可用的开关,包含Process、Order、Task
 type FLOW_STATUS int
 

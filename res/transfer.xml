@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process displayName="协办流程测试" name="assist">
+<process displayName="转派任务测试" name="transfer">
     <start displayName="start1" name="start1">
         <transition name="transition1" to="task1"/>
     </start>
     <end displayName="end1" name="end1"/>
     <task autoExecute="true" displayName="task1" name="task1" performType="ANY" taskType="MAJOR">
         <transition name="transition2" to="task2"/>
-        <transition name="transition4" to="task3"/>
     </task>
     <task autoExecute="true" displayName="task2" name="task2" performType="ANY" taskType="MAJOR">
         <transition name="transition3" to="end1"/>
     </task>
-    <task autoExecute="true" displayName="task3" name="task3" performType="ANY" taskType="ASSIST"/>
 </process>

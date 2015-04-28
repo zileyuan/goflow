@@ -8,11 +8,11 @@ import (
 )
 
 type Engine struct {
-	processService *ProcessService //流程定义业务类
-	orderService   *OrderService   //流程实例业务类
-	taskService    *TaskService    //任务业务类
-	queryService   *QueryService   //查询业务类
-	managerService *ManagerService //管理业务类
+	ProcessService //流程定义业务类
+	OrderService   //流程实例业务类
+	TaskService    //任务业务类
+	QueryService   //查询业务类
+	ManagerService //管理业务类
 }
 
 func (p *Engine) StartInstanceById(id string, operator string, args map[string]interface{}) *Order {
@@ -22,8 +22,7 @@ func (p *Engine) StartInstanceById(id string, operator string, args map[string]i
 }
 
 func (p *Engine) StartInstanceByName(name string, version int, operator string, args map[string]interface{}) *Order {
-	process := new(Process)
-	process.GetProcessByVersion(name, version)
+	process := p.GetProcessByVersion(name, version)
 	return p.StartProcess(process, operator, args)
 }
 
@@ -37,7 +36,7 @@ func (p *Engine) StartProcess(process *Process, operator string, args map[string
 }
 
 func (p *Engine) ExecuteByProcess(process *Process, operator string, args map[string]interface{}) *Execution {
-	order := p.orderService.CreateOrder(process, operator)
+	order := p.CreateOrder(process, operator)
 	execution := &Execution{
 		Engine:   p,
 		Process:  process,
@@ -49,7 +48,7 @@ func (p *Engine) ExecuteByProcess(process *Process, operator string, args map[st
 
 func (p *Engine) ExecuteByTaskId(id string, operator string, args map[string]interface{}) *Execution {
 	//todo
-	task := p.taskService.Complete(id, operator, args)
+	task := p.CompleteTask(id, operator, args)
 
 	order := &Order{}
 	order.GetOrderById(task.OrderId)
@@ -77,7 +76,7 @@ func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]
 	if execution != nil {
 		model := execution.Process.Model
 		if nodeName == "" {
-			task := p.taskService.RejectTask(model, execution.Task)
+			task := p.RejectTask(model, execution.Task)
 			execution.AddTask(task)
 		} else {
 			nodeModel := model.GetNode(nodeName)
@@ -94,10 +93,14 @@ func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]
 }
 
 func NewEngine() *Engine {
-	return nil
+	engine := &Engine{}
+	engine.InitProcessService()
+	return engine
 }
 
 func init() {
 	f, _ := os.Create("goflow.log")
 	log.Std.SetOutput(f)
+
+	InitAccess()
 }

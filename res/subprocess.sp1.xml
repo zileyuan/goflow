@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process displayName="测试串行子流程" name="sp1">
+    <start displayName="start1" name="start1">
+        <transition name="transition1" to="task1"/>
+    </start>
+    <end displayName="end1" name="end1"/>
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+        <transition name="transition2" to="subprocess1"/>
+    </task>
+    <subprocess displayName="subprocess1" name="subprocess1" processName="child">
+        <transition name="transition3" to="end1"/>
+    </subprocess>
+</process>

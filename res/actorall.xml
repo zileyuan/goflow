@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<process displayName="测试简单流程" name="simple">
+<process displayName="测试简单会签" name="actorall">
     <start displayName="start1" name="start1">
         <transition name="transition1" to="task1"/>
     </start>
 	<end displayName="end1" name="end1"/>
-    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ALL">
         <transition name="transition2" to="end1"/>
-    </task>    
+    </task> 
 </process>
