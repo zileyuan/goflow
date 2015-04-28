@@ -8,14 +8,14 @@ import (
 
 //流程定义实体类
 type Process struct {
-	Id             string        `xorm:"varchar(48) pk notnull"` //主键ID
+	Id             string        `xorm:"varchar(36) pk notnull"` //主键ID
 	Version        int           `xorm:"tinyint"`                //版本
 	Name           string        `xorm:"varchar(100) index"`     //流程定义名称
 	DisplayName    string        `xorm:"varchar(200)"`           //流程定义显示名称
 	InstanceAction string        `xorm:"varchar(200)"`           //当前流程的实例Action,(Web为URL,一般为流程第一步的URL;APP需要自定义),该字段可以直接打开流程申请的表单
 	State          FLOW_STATUS   `xorm:"tinyint"`                //状态
 	CreateTime     time.Time     `xorm:"datetime"`               //创建时间
-	Creator        string        `xorm:"varchar(48)"`            //创建人
+	Creator        string        `xorm:"varchar(36)"`            //创建人
 	Content        []byte        `xorm:"text"`                   //流程定义XML
 	Model          *ProcessModel `xorm:"-"`                      //Model对象
 }

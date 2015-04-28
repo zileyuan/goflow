@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
+	"github.com/bitly/go-simplejson"
 	"github.com/lunny/log"
 )
 
@@ -27,4 +28,16 @@ func LoadXML(xmlFile string) []byte {
 		panic(fmt.Errorf("error to read xml file!"))
 	}
 	return content
+}
+
+func MapToJson(v map[string]interface{}) string {
+	js := simplejson.New()
+	js.Set("map", v)
+	ret, _ := js.Get("map").String()
+	return ret
+}
+
+func JsonToMap(v string) map[string]interface{} {
+	js, _ := simplejson.NewJson([]byte(v))
+	return js.MustMap()
 }

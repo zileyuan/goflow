@@ -13,15 +13,17 @@ type TaskModel struct {
 	ExpireTime  time.Time    `xml:"-"`                //期望完成时间
 }
 
-func (p *TaskModel) CreateHandle(execution *Execution) {
+func (p *TaskModel) CreateHandle(execution *Execution) error {
 	tasks := execution.Engine.CreateTask(p, execution)
 	execution.AddTasks(tasks)
+	return nil
 }
 
-func (p *TaskModel) MergeActorHandle(execution *Execution) {
-
+func (p *TaskModel) MergeActorHandle(execution *Execution) error {
+	return nil
 }
 
-func (p *TaskModel) Execute(execution *Execution) {
-
+func (p *TaskModel) Execute(execution *Execution) error {
+	//todo
+	return nil
 }

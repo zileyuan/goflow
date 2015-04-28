@@ -1,6 +1,36 @@
 package goflow
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Knetic/govaluate"
+)
+
+func TestExpression(t *testing.T) {
+	expression1, _ := govaluate.NewEvaluableExpression("content")
+	parameters1 := make(map[string]interface{}, 8)
+	parameters1["content"] = "toTask1"
+	next1, _ := expression1.Evaluate(parameters1)
+	t.Logf("next1 %v", next1)
+
+	expression2, _ := govaluate.NewEvaluableExpression("content == 200")
+	parameters2 := make(map[string]interface{}, 8)
+	parameters2["content"] = 200.0
+	next2, _ := expression2.Evaluate(parameters2)
+	t.Logf("next2 %v", next2)
+
+	expression3, _ := govaluate.NewEvaluableExpression("content > 200")
+	parameters3 := make(map[string]interface{}, 8)
+	parameters3["content"] = 200.0
+	next3, _ := expression3.Evaluate(parameters3)
+	t.Logf("next3 %v", next3)
+
+	expression4, _ := govaluate.NewEvaluableExpression("content < 200")
+	parameters4 := make(map[string]interface{}, 8)
+	parameters4["content"] = 200.0
+	next4, _ := expression4.Evaluate(parameters4)
+	t.Logf("next4 %v", next4)
+}
 
 func TestActorAll(t *testing.T) {
 	bytes := LoadXML("res/actorall.xml")
@@ -10,6 +40,7 @@ func TestActorAll(t *testing.T) {
 		"task1.operator": []string{"1", "2"},
 	}
 	order := engine.StartInstanceById(processId, "2", args)
+	t.Logf("OrderId %s", order.Id)
 }
 
 func TestForkJoin(t *testing.T) {
@@ -25,7 +56,7 @@ func TestForkJoin(t *testing.T) {
 	t.Logf("OrderId %s", order.Id)
 	tasks := engine.GetActiveTasks(order.Id)
 	for _, task := range tasks {
-		engine.ExecuteByTaskId(task.Id, "1")
+		engine.ExecuteByTaskId(task.Id, "1", args)
 	}
 }
 
@@ -36,7 +67,7 @@ func TestDecision1(t *testing.T) {
 
 	args := map[string]interface{}{
 		"task2.operator": []string{"1"},
-		"content":        250,
+		"content":        250.0,
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
@@ -51,7 +82,7 @@ func TestDecision2(t *testing.T) {
 		"task1.operator": []string{"1"},
 		"task2.operator": []string{"1"},
 		"task3.operator": []string{"1"},
-		"content":        250,
+		"content":        250.0,
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
@@ -65,7 +96,7 @@ func TestSimple(t *testing.T) {
 		"task1.operator": []string{"1"},
 		"task2.operator": []string{"1"},
 		"task3.operator": []string{"1"},
-		"content":        250,
+		"content":        250.0,
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
@@ -74,7 +105,7 @@ func TestSimple(t *testing.T) {
 func TestAssist(t *testing.T) {
 	bytes := LoadXML("res/assist.xml")
 	engine := NewEngine()
-	processId := engine.Deploy(bytes, "")
+	engine.Deploy(bytes, "")
 	order := engine.StartInstanceByName("assist", -1, "2", nil)
 	tasks := engine.GetActiveTasks(order.Id)
 	for _, task := range tasks {
@@ -86,8 +117,8 @@ func TestSubProcess1(t *testing.T) {
 	engine := NewEngine()
 	bytes := LoadXML("res/subprocess.child.xml")
 	processId := engine.Deploy(bytes, "")
-	bytes := LoadXML("res/subprocess.sp1.xml")
-	processId := engine.Deploy(bytes, "")
+	bytes = LoadXML("res/subprocess.sp1.xml")
+	processId = engine.Deploy(bytes, "")
 
 	args := map[string]interface{}{
 		"task1.operator": []string{"1"},
@@ -105,8 +136,8 @@ func TestSubProcess2(t *testing.T) {
 	engine := NewEngine()
 	bytes := LoadXML("res/subprocess.child.xml")
 	processId := engine.Deploy(bytes, "")
-	bytes := LoadXML("res/subprocess.sp2.xml")
-	processId := engine.Deploy(bytes, "")
+	bytes = LoadXML("res/subprocess.sp2.xml")
+	processId = engine.Deploy(bytes, "")
 
 	args := map[string]interface{}{
 		"task1.operator": []string{"1"},
@@ -123,7 +154,7 @@ func TestSubProcess2(t *testing.T) {
 func TestGroup(t *testing.T) {
 	bytes := LoadXML("res/group.xml")
 	engine := NewEngine()
-	processId := engine.Deploy(bytes, "")
+	engine.Deploy(bytes, "")
 	args := map[string]interface{}{
 		"task1.operator": []string{"role1"},
 	}
@@ -146,7 +177,7 @@ func TestRight(t *testing.T) {
 	t.Logf("OrderId %s", order.Id)
 	tasks := engine.GetActiveTasks(order.Id)
 	for _, task := range tasks {
-		engine.ExecuteByTaskId(task.Id, ER_ADMIN, args)
+		engine.ExecuteByTaskId(task.Id, string(ER_ADMIN), args)
 	}
 }
 

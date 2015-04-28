@@ -4,6 +4,6 @@ type StartModel struct {
 	NodeModel
 }
 
-func (p *StartModel) Execute(execution *Execution) {
-	p.RunOutTransition(execution)
+func (p *StartModel) Execute(execution *Execution) error {
+	return p.RunOutTransition(execution)
 }
