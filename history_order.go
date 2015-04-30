@@ -17,7 +17,7 @@ type HistoryOrder struct {
 	FinishTime time.Time   `xorm:"datetime"`                  //完成时间
 }
 
-func (p *HistoryOrder) DataFromOrder(order *Order) {
+func (p *HistoryOrder) DataByOrder(order *Order) {
 	p.Id = order.Id
 	p.ProcessId = order.ProcessId
 	p.CreateTime = order.CreateTime

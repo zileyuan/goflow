@@ -282,7 +282,7 @@ func CreateOrder(process *Process, operator string) *Order {
 
 func SaveOrder(order *Order) {
 	historyOrder := new(HistoryOrder)
-	historyOrder.DataFromOrder(order)
+	historyOrder.DataByOrder(order)
 
 	historyOrder.OrderState = FS_ACTIVITY
 	Save(order, order.Id)
@@ -313,5 +313,18 @@ func ResumeOrder(id string) {
 }
 
 func TerminateOrder(id string, operator string) {
-	//todo
+	tasks := GetActiveTasksByOrderId(id)
+	for _, task := range tasks {
+		CompleteTask(task.Id, operator, nil)
+	}
+
+	order := &Order{}
+	order.GetOrderById(id)
+	historyOrder := &HistoryOrder{}
+	historyOrder.DataByOrder(order)
+	historyOrder.OrderState = FS_TERMINATION
+	historyOrder.FinishTime = time.Now()
+
+	Update(historyOrder, historyOrder.Id)
+	DeleteById(order, order.Id)
 }

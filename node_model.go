@@ -27,7 +27,7 @@ func (p *NodeModel) RunOutTransition(execution *Execution) error {
 	return nil
 }
 
-func (p *NodeModel) MergeHandle(execution *Execution, activeNodes []string) error {
+func MergeHandle(execution *Execution, activeNodes []string) error {
 	processModel := execution.Process.Model
 
 	isSubProcessMerged := false

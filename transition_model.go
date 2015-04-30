@@ -16,7 +16,7 @@ func (p *TransitionModel) Execute(execution *Execution) error {
 		switch p.Target.(type) {
 		case *TaskModel:
 			taskModel := p.Target.(*TaskModel)
-			return taskModel.CreateHandle(execution)
+			return CreateHandle(taskModel, execution)
 		default:
 			return p.Target.Execute(execution)
 		}

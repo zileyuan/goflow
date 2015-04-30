@@ -13,25 +13,25 @@ type TaskModel struct {
 	ExpireTime  time.Time    `xml:"-"`                //期望完成时间
 }
 
-func (p *TaskModel) CreateHandle(execution *Execution) error {
-	tasks := CreateTask(p, execution)
-	execution.Tasks = append(execution.Tasks, tasks...)
-	return nil
-}
-
-func (p *TaskModel) MergeActorHandle(execution *Execution) error {
-	activeNodes := []string{p.Name}
-	return p.MergeHandle(execution, activeNodes)
-}
-
 func (p *TaskModel) Execute(execution *Execution) error {
 	if p.PerformType == PT_ANY {
 		p.RunOutTransition(execution)
 	} else {
-		p.MergeActorHandle(execution)
+		MergeActorHandle(p, execution)
 		if execution.IsMerged {
 			p.RunOutTransition(execution)
 		}
 	}
 	return nil
+}
+
+func CreateHandle(tm *TaskModel, execution *Execution) error {
+	tasks := CreateTask(tm, execution)
+	execution.Tasks = append(execution.Tasks, tasks...)
+	return nil
+}
+
+func MergeActorHandle(tm *TaskModel, execution *Execution) error {
+	activeNodes := []string{tm.Name}
+	return MergeHandle(execution, activeNodes)
 }
