@@ -9,7 +9,6 @@ import (
 
 type Engine struct {
 	ProcessService //流程定义业务类
-	TaskService    //任务业务类
 }
 
 func (p *Engine) StartInstanceById(id string, operator string, args map[string]interface{}) *Order {

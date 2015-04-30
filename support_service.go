@@ -88,7 +88,7 @@ func SaveTask(task *Task, actors ...string) {
 }
 
 //根据已有任务、任务类型、参与者创建新的任务，适用于转派，动态协办处理
-func (p *TaskService) CreateNewTask(taskId string, taskType TASK_TYPE, actors ...string) {
+func CreateNewTask(taskId string, taskType TASK_TYPE, actors ...string) {
 	task := &Task{}
 	task.GetTaskById(taskId)
 	newTask := *task
@@ -166,7 +166,34 @@ func AddTaskActor(taskId string, performType PERFORM_TYPE, actors ...string) {
 	}
 }
 
-func Take(taskId string, operator string) *Task {
+func RemoveTaskActor(taskId string, actors ...string) {
+	task := &Task{}
+	task.GetTaskById(taskId)
+	if len(actors) > 0 && task.TaskType == TT_MAJOR {
+		for _, actorId := range actors {
+			taskActor := &TaskActor{
+				TaskId:  taskId,
+				ActorId: actorId,
+			}
+			Delete(taskActor)
+		}
+		v := JsonToMap(task.Variable)
+		oldActors := strings.Split(v[DEFAULT_KEY_ACTOR].(string), ",")
+		for _, actor := range actors {
+			for k, s := range oldActors {
+				if s == actor {
+					oldActors = StringsRemoveAtIndex(oldActors, k)
+					break
+				}
+			}
+		}
+		v[DEFAULT_KEY_ACTOR] = oldActors
+		task.Variable = MapToJson(v)
+		Update(task, task.Id)
+	}
+}
+
+func TakeTask(taskId string, operator string) *Task {
 	task := &Task{}
 	success, err := task.GetTaskById(taskId)
 	if err != nil {
