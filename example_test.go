@@ -8,25 +8,25 @@ import (
 
 func TestExpression(t *testing.T) {
 	expression1, _ := govaluate.NewEvaluableExpression("content")
-	parameters1 := make(map[string]interface{}, 8)
+	parameters1 := make(map[string]interface{})
 	parameters1["content"] = "toTask1"
 	next1, _ := expression1.Evaluate(parameters1)
 	t.Logf("next1 %v", next1)
 
 	expression2, _ := govaluate.NewEvaluableExpression("content == 200")
-	parameters2 := make(map[string]interface{}, 8)
+	parameters2 := make(map[string]interface{})
 	parameters2["content"] = 200.0
 	next2, _ := expression2.Evaluate(parameters2)
 	t.Logf("next2 %v", next2)
 
 	expression3, _ := govaluate.NewEvaluableExpression("content > 200")
-	parameters3 := make(map[string]interface{}, 8)
+	parameters3 := make(map[string]interface{})
 	parameters3["content"] = 200.0
 	next3, _ := expression3.Evaluate(parameters3)
 	t.Logf("next3 %v", next3)
 
 	expression4, _ := govaluate.NewEvaluableExpression("content < 200")
-	parameters4 := make(map[string]interface{}, 8)
+	parameters4 := make(map[string]interface{})
 	parameters4["content"] = 200.0
 	next4, _ := expression4.Evaluate(parameters4)
 	t.Logf("next4 %v", next4)
@@ -54,7 +54,7 @@ func TestForkJoin(t *testing.T) {
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.ExecuteByTaskId(task.Id, "1", args)
 	}
@@ -107,7 +107,7 @@ func TestAssist(t *testing.T) {
 	engine := NewEngine()
 	engine.Deploy(bytes, "")
 	order := engine.StartInstanceByName("assist", -1, "2", nil)
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.CreateNewTask(task.Id, TT_ASSIST, "test")
 	}
@@ -126,7 +126,7 @@ func TestSubProcess1(t *testing.T) {
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
 
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.ExecuteByTaskId(task.Id, "1", args)
 	}
@@ -145,7 +145,7 @@ func TestSubProcess2(t *testing.T) {
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
 
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.ExecuteByTaskId(task.Id, "1", args)
 	}
@@ -160,7 +160,7 @@ func TestGroup(t *testing.T) {
 	}
 	order := engine.StartInstanceByName("group", 0, "2", args)
 	t.Logf("OrderId %s", order.Id)
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.ExecuteByTaskId(task.Id, "test1", args)
 	}
@@ -175,7 +175,7 @@ func TestRight(t *testing.T) {
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.ExecuteByTaskId(task.Id, string(ER_ADMIN), args)
 	}
@@ -190,7 +190,7 @@ func TestTake(t *testing.T) {
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
-	tasks := engine.GetActiveTasks(order.Id)
+	tasks := engine.GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
 		engine.Take(task.Id, "1")
 	}

@@ -1,9 +1,8 @@
 package goflow
 
 import (
+	"strings"
 	"time"
-
-	"github.com/lunny/log"
 )
 
 //任务实体类
@@ -18,10 +17,11 @@ type Task struct {
 	Operator     string       `xorm:"varchar(36)"`                //任务处理者ID
 	CreateTime   time.Time    `xorm:"datetime"`                   //任务创建时间
 	FinishTime   time.Time    `xorm:"datetime"`                   //任务完成时间
-	ExpireTime   int          `xorm:"datetime"`                   //期望任务完成时间
+	ExpireTime   time.Time    `xorm:"datetime"`                   //期望任务完成时间
 	Action       string       `xorm:"varchar(200)"`               //任务关联的Action(WEB为表单URL)
 	ParentTaskId string       `xorm:"varchar(36) index"`          //父任务ID
 	Variable     string       `xorm:"varchar(2000)"`              //任务附属变量(json存储)
+	Model        *TaskModel   `xorm:"-"`                          //Model对象
 }
 
 func (p *Task) GetTaskById(id string) (bool, error) {
@@ -30,33 +30,58 @@ func (p *Task) GetTaskById(id string) (bool, error) {
 	return success, err
 }
 
-func (p *Task) Update() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Update(p)
-	log.Infof("Task %d updated", p.Id)
-	return err
+func (p *Task) GetActiveTasks() ([]*Task, error) {
+	tasks := make([]*Task, 0)
+	err := orm.Find(&tasks, p)
+	return tasks, err
 }
 
-func (p *Task) Save() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.InsertOne(p)
-	log.Infof("Task %d inserted", p.Id)
-	return err
-}
-
-func (p *Task) Delete() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Delete(p)
-	log.Infof("Task %d deleted", p.Id)
-	return err
-}
-
-func (p *Task) GetActiveTasks(orderId string) ([]*Task, error) {
+func (p *Task) GetActiveTasksByOrderId(orderId string) ([]*Task, error) {
 	p.OrderId = orderId
 	tasks := make([]*Task, 0)
 	err := orm.Find(&tasks, p)
+	return tasks, err
+}
+
+func (p *Task) GetTaskActors() ([]*TaskActor, error) {
+	taskActors := make([]*TaskActor, 0)
+	taskActor := &TaskActor{
+		TaskId: p.Id,
+	}
+	err := orm.Find(&taskActors, taskActor)
+	return taskActors, err
+}
+
+func GetNextAnyActiveTasks(parentTaskId string) ([]*Task, error) {
+	task := &Task{
+		ParentTaskId: parentTaskId,
+	}
+	tasks := make([]*Task, 0)
+	err := orm.Find(&tasks, task)
+	return tasks, err
+}
+
+func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string) ([]*Task, error) {
+	historyTask := &HistoryTask{
+		OrderId:      orderId,
+		TaskName:     taskName,
+		ParentTaskId: parentTaskId,
+	}
+	historyTasks := make([]*HistoryTask, 0)
+	err := orm.Find(&historyTasks, historyTask)
+
+	ids := make([]string, 0)
+	for _, historyTask = range historyTasks {
+		ids = append(ids, historyTask.Id)
+	}
+	tasks := make([]*Task, 0)
+	err = orm.Where("ParentTaskId in (?)", strings.Join(ids, ",")).Find(&tasks)
+
+	return tasks, err
+}
+
+func GetActiveTasksSQL(querystring string, args ...interface{}) ([]*Task, error) {
+	tasks := make([]*Task, 0)
+	err := orm.Where(querystring, args).Find(&tasks)
 	return tasks, err
 }

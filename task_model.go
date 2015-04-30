@@ -5,7 +5,7 @@ import (
 )
 
 type TaskModel struct {
-	NodeModel
+	WorkModel
 	Assignee    string       `xml:"assignee,attr"`    //参与者变量名称
 	PerformType PERFORM_TYPE `xml:"performType,attr"` //参与方式
 	TaskType    TASK_TYPE    `xml:"taskType,attr"`    //任务类型
@@ -14,16 +14,24 @@ type TaskModel struct {
 }
 
 func (p *TaskModel) CreateHandle(execution *Execution) error {
-	tasks := execution.Engine.CreateTask(p, execution)
-	execution.AddTasks(tasks)
+	tasks := CreateTask(p, execution)
+	execution.Tasks = append(execution.Tasks, tasks...)
 	return nil
 }
 
 func (p *TaskModel) MergeActorHandle(execution *Execution) error {
-	return nil
+	activeNodes := []string{p.Name}
+	return p.MergeHandle(execution, activeNodes)
 }
 
 func (p *TaskModel) Execute(execution *Execution) error {
-	//todo
+	if p.PerformType == PT_ANY {
+		p.RunOutTransition(execution)
+	} else {
+		p.MergeActorHandle(execution)
+		if execution.IsMerged {
+			p.RunOutTransition(execution)
+		}
+	}
 	return nil
 }

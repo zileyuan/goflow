@@ -1,10 +1,6 @@
 package goflow
 
-import (
-	"time"
-
-	"github.com/lunny/log"
-)
+import "time"
 
 //任务实体类
 type HistoryTask struct {
@@ -17,25 +13,31 @@ type HistoryTask struct {
 	Operator     string       `xorm:"varchar(36)"`                //任务处理者ID
 	CreateTime   time.Time    `xorm:"datetime notnull"`           //任务创建时间
 	FinishTime   time.Time    `xorm:"datetime"`                   //任务完成时间
-	ExpireTime   int          `xorm:"datetime"`                   //期望任务完成时间
+	ExpireTime   time.Time    `xorm:"datetime"`                   //期望任务完成时间
 	Action       string       `xorm:"varchar(200)"`               //任务关联的Action(WEB为表单URL)
 	ParentTaskId string       `xorm:"varchar(36) index"`          //父任务ID
 	Variable     string       `xorm:"varchar(2000)"`              //任务附属变量(json存储)
 	TaskState    FLOW_STATUS  `xorm:"tinyint notnull"`            //任务状态
 }
 
-func (p *HistoryTask) Update() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Update(p)
-	log.Infof("HistoryTask %d updated", p.Id)
-	return err
+func (p *HistoryTask) GetHistoryTaskById(id string) (bool, error) {
+	p.Id = id
+	success, err := orm.Get(p)
+	return success, err
 }
 
-func (p *HistoryTask) Save() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.InsertOne(p)
-	log.Infof("HistoryTask %d inserted", p.Id)
-	return err
+func (p *HistoryTask) Undo() *Task {
+	task := &Task{
+		Id:           p.Id,
+		TaskName:     p.TaskName,
+		DisplayName:  p.DisplayName,
+		TaskType:     p.TaskType,
+		ExpireTime:   p.ExpireTime,
+		Action:       p.Action,
+		ParentTaskId: p.ParentTaskId,
+		Variable:     p.Variable,
+		PerformType:  p.PerformType,
+		Operator:     p.Operator,
+	}
+	return task
 }

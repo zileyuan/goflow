@@ -46,7 +46,7 @@ func (p *ProcessService) Deploy(input []byte, creator string) string {
 		CreateTime: time.Now(),
 	}
 	p.Cache(process)
-	process.Save()
+	Save(process, process.Id)
 
 	return process.Id
 }
@@ -62,7 +62,7 @@ func (p *ProcessService) ReDeploy(id string, input []byte) {
 	if success {
 		process.Content = input
 		p.Cache(process)
-		process.Update()
+		Update(process, process.Id)
 	} else {
 		log.Infof("fail to get process by id %v", err)
 	}
@@ -79,10 +79,22 @@ func (p *ProcessService) UnDeploy(id string) {
 	if success {
 		process.State = FS_FINISH
 		p.Cache(process)
-		process.Update()
+		Update(process, process.Id)
 	} else {
 		log.Infof("fail to get process by id %v", err)
 	}
+}
+
+func (p *ProcessService) GetProcessById(id string) *Process {
+	processName := p.NameCache[id]
+	process := p.ProcessCache[processName]
+
+	if process == nil {
+		process = &Process{}
+		process.GetProcessById(id)
+		p.Cache(process)
+	}
+	return process
 }
 
 func (p *ProcessService) GetProcessByVersion(name string, version int) *Process {

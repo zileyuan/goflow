@@ -1,10 +1,6 @@
 package goflow
 
-import (
-	"time"
-
-	"github.com/lunny/log"
-)
+import "time"
 
 //流程工作单实体类（一般称为流程实例）
 type Order struct {
@@ -23,32 +19,14 @@ type Order struct {
 	Variable       string    `xorm:"varchar(2000)"`             //流程实例附属变量
 }
 
-func (p *Order) Save() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.InsertOne(p)
-	log.Infof("Order %d inserted", p.Id)
-	return err
-}
-
-func (p *Order) Update() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Update(p)
-	log.Infof("Order %d updated", p.Id)
-	return err
-}
-
-func (p *Order) Delete() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Delete(p)
-	log.Infof("Order %d deleted", p.Id)
-	return err
-}
-
 func (p *Order) GetOrderById(id string) (bool, error) {
 	p.Id = id
 	success, err := orm.Get(p)
 	return success, err
+}
+
+func GetActiveOrdersSQL(querystring string, args ...interface{}) ([]*Order, error) {
+	orders := make([]*Order, 0)
+	err := orm.Where(querystring, args).Find(&orders)
+	return orders, err
 }

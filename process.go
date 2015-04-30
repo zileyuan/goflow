@@ -1,10 +1,6 @@
 package goflow
 
-import (
-	"time"
-
-	"github.com/lunny/log"
-)
+import "time"
 
 //流程定义实体类
 type Process struct {
@@ -18,30 +14,6 @@ type Process struct {
 	Creator        string        `xorm:"varchar(36)"`            //创建人
 	Content        []byte        `xorm:"text"`                   //流程定义XML
 	Model          *ProcessModel `xorm:"-"`                      //Model对象
-}
-
-func (p *Process) Save() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.InsertOne(p)
-	log.Infof("Process %d inserted", p.Id)
-	return err
-}
-
-func (p *Process) Update() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Update(p)
-	log.Infof("Process %d updated", p.Id)
-	return err
-}
-
-func (p *Process) Delete() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Delete(p)
-	log.Infof("Process %d deleted", p.Id)
-	return err
 }
 
 func (p *Process) GetProcessById(id string) (bool, error) {

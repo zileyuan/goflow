@@ -9,10 +9,7 @@ import (
 
 type Engine struct {
 	ProcessService //流程定义业务类
-	OrderService   //流程实例业务类
 	TaskService    //任务业务类
-	QueryService   //查询业务类
-	ManagerService //管理业务类
 }
 
 func (p *Engine) StartInstanceById(id string, operator string, args map[string]interface{}) *Order {
@@ -36,7 +33,7 @@ func (p *Engine) StartProcess(process *Process, operator string, args map[string
 }
 
 func (p *Engine) ExecuteByProcess(process *Process, operator string, args map[string]interface{}) *Execution {
-	order := p.CreateOrder(process, operator)
+	order := CreateOrder(process, operator)
 	execution := &Execution{
 		Engine:   p,
 		Process:  process,
@@ -47,8 +44,7 @@ func (p *Engine) ExecuteByProcess(process *Process, operator string, args map[st
 }
 
 func (p *Engine) ExecuteByTaskId(id string, operator string, args map[string]interface{}) *Execution {
-	//todo
-	task := p.CompleteTask(id, operator, args)
+	task := CompleteTask(id, operator, args)
 
 	order := &Order{}
 	order.GetOrderById(task.OrderId)
@@ -76,8 +72,8 @@ func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]
 	if execution != nil {
 		model := execution.Process.Model
 		if nodeName == "" {
-			task := p.RejectTask(model, execution.Task)
-			execution.AddTask(task)
+			task := RejectTask(model, execution.Task)
+			execution.Tasks = append(execution.Tasks, task)
 		} else {
 			nodeModel := model.GetNode(nodeName)
 			tm := &TransitionModel{
@@ -86,7 +82,6 @@ func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]
 			}
 			tm.Execute(execution)
 		}
-
 		return execution.Tasks
 	}
 	return []*Task{}

@@ -7,7 +7,12 @@ import (
 
 	"github.com/bitly/go-simplejson"
 	"github.com/lunny/log"
+	"github.com/satori/go.uuid"
 )
+
+func NewUUID() string {
+	return uuid.NewV4().String()
+}
 
 func StrToInt(value string) int {
 	if value == "" {
@@ -40,4 +45,12 @@ func MapToJson(v map[string]interface{}) string {
 func JsonToMap(v string) map[string]interface{} {
 	js, _ := simplejson.NewJson([]byte(v))
 	return js.MustMap()
+}
+
+func StringsRemove(strings []string, start, end int) []string {
+	return append(strings[:start], strings[end:]...)
+}
+
+func StringsRemoveAtIndex(strings []string, index int) []string {
+	return StringsRemove(strings, index, index+1)
 }

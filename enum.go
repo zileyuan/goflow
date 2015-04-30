@@ -1,7 +1,9 @@
 package goflow
 
 const (
-	DEFAULT_SEPARATOR = "." //默认分割符
+	DEFAULT_SEPARATOR = "."                                    //默认分割符
+	DEFAULT_KEY_ACTOR = "SPECIFY_ACTOR"                        //actor
+	DEFAULT_START_ID  = "00000000-0000-0000-0000-000000000000" //start node
 )
 
 //流程可用的开关,包含Process、Order、Task

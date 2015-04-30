@@ -25,7 +25,69 @@ func (p *ProcessModel) GetStart() *StartModel {
 	return nil
 }
 
+func (p *ProcessModel) ContainsSubProcessNodeNames(nodeNames ...string) bool {
+	for _, node := range p.SubProcessModels {
+		for _, nodeName := range nodeNames {
+			if node.Name == nodeName {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (p *ProcessModel) ContainsTaskNodeNames(nodeNames ...string) bool {
+	for _, node := range p.TaskModels {
+		for _, nodeName := range nodeNames {
+			if node.Name == nodeName {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (p *ProcessModel) GetNode(name string) INodeModel {
-	//todo
+	for _, v := range p.StartNodes {
+		if v.Name == name {
+			return v
+		}
+	}
+
+	for _, v := range p.EndModels {
+		if v.Name == name {
+			return v
+		}
+	}
+
+	for _, v := range p.TaskModels {
+		if v.Name == name {
+			return v
+		}
+	}
+
+	for _, v := range p.DecisionModels {
+		if v.Name == name {
+			return v
+		}
+	}
+
+	for _, v := range p.ForkModels {
+		if v.Name == name {
+			return v
+		}
+	}
+
+	for _, v := range p.JoinModels {
+		if v.Name == name {
+			return v
+		}
+	}
+
+	for _, v := range p.SubProcessModels {
+		if v.Name == name {
+			return v
+		}
+	}
 	return nil
 }

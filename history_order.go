@@ -1,10 +1,6 @@
 package goflow
 
-import (
-	"time"
-
-	"github.com/lunny/log"
-)
+import "time"
 
 //历史流程实例实体类
 type HistoryOrder struct {
@@ -31,30 +27,6 @@ func (p *HistoryOrder) DataFromOrder(order *Order) {
 	p.Priority = order.Priority
 	p.OrderNo = order.OrderNo
 	p.Variable = order.Variable
-}
-
-func (p *HistoryOrder) Save() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.InsertOne(p)
-	log.Infof("HistoryOrder %d inserted", p.Id)
-	return err
-}
-
-func (p *HistoryOrder) Update() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Update(p)
-	log.Infof("HistoryOrder %d updated", p.Id)
-	return err
-}
-
-func (p *HistoryOrder) Delete() error {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(p.Id).Delete(p)
-	log.Infof("HistoryOrder %d deleted", p.Id)
-	return err
 }
 
 func (p *HistoryOrder) GetHistoryOrderById(id string) (bool, error) {

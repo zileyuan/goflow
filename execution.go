@@ -13,11 +13,3 @@ type Execution struct {
 	Tasks          []*Task                //返回的任务列表
 	IsMerged       bool                   //是否已合并,针对join节点的处理
 }
-
-func (p *Execution) AddTasks(tasks []*Task) {
-	p.Tasks = append(p.Tasks, tasks...)
-}
-
-func (p *Execution) AddTask(tasks *Task) {
-	p.Tasks = append(p.Tasks, tasks)
-}
