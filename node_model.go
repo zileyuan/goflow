@@ -9,6 +9,10 @@ type NodeModel struct {
 	Outputs []*TransitionModel `xml:"transition"` //输出变迁集合
 }
 
+func (p *NodeModel) AddInputs(tm ...*TransitionModel) {
+	p.Inputs = append(p.Inputs, tm...)
+}
+
 //得到输入变迁
 func (p *NodeModel) GetInputs() []*TransitionModel {
 	return p.Inputs

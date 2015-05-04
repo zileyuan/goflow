@@ -1,7 +1,6 @@
 package goflow
 
 import (
-	"encoding/xml"
 	"fmt"
 	"time"
 
@@ -26,14 +25,11 @@ func (p *ProcessService) Cache(process *Process) {
 	processName := process.Name + DEFAULT_SEPARATOR + IntToStr(process.Version)
 	delete(p.ProcessCache, processName)
 
-	var pm ProcessModel
-	err := xml.Unmarshal([]byte(process.Content), &pm)
-
-	if err != nil {
-		log.Errorf("error to unmarshal xml %v", err)
-		panic(fmt.Errorf("error to unmarshal xml!"))
+	if process.Model == nil {
+		processModel := &ProcessModel{}
+		processModel.BuildRelationship([]byte(process.Content))
+		process.SetModel(processModel)
 	}
-	process.SetModel(&pm)
 
 	processName = process.Name + DEFAULT_SEPARATOR + IntToStr(process.Version)
 	p.ProcessCache[processName] = process
@@ -43,13 +39,24 @@ func (p *ProcessService) Cache(process *Process) {
 //部署Process
 func (p *ProcessService) Deploy(input []byte, creator string) string {
 
+	processModel := &ProcessModel{}
+	processModel.BuildRelationship(input)
+
+	ver := -1
+	oldProcess, _ := GetLatestProcess(processModel.Name)
+	if oldProcess == nil {
+		ver = oldProcess.Version
+	}
+
 	process := &Process{
 		Id:         NewUUID(),
 		State:      FS_ACTIVITY,
 		Content:    string(input),
 		Creator:    creator,
 		CreateTime: time.Now(),
+		Version:    ver + 1,
 	}
+	process.SetModel(processModel)
 	p.Cache(process)
 	Save(process, process.Id)
 
@@ -107,9 +114,9 @@ func (p *ProcessService) GetProcessById(id string) *Process {
 
 //根据名称、版本得到Process
 func (p *ProcessService) GetProcessByVersion(name string, version int) *Process {
-	dbProcess := &Process{}
+	var dbProcess *Process
 	if version == -1 {
-		dbProcess, _ := dbProcess.GetLatestProcess(name)
+		dbProcess, _ := GetLatestProcess(name)
 		if dbProcess == nil {
 			return nil
 		}

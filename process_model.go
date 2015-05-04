@@ -1,7 +1,11 @@
 package goflow
 
 import (
+	"encoding/xml"
+	"fmt"
 	"time"
+
+	"github.com/lunny/log"
 )
 
 //XML定义process节点元素
@@ -16,6 +20,51 @@ type ProcessModel struct {
 	SubProcessModels []*SubProcessModel `xml:"subprocess"`          //子流程节点
 	InstanceAction   string             `xml:"instanceAction,attr"` //流程实例启动Action(web为url)
 	ExpireTime       time.Time          `xml:"expireTime,attr"`     //期望完成时间
+	Models           []INodeModel       `xml:"-"`                   //上面所有Node节点(Start\End\Task\Decision\Fork\Join\SubProcess)的集合
+}
+
+func (p *ProcessModel) BuildRelationship(content []byte) {
+	//解析xml内容
+	err := xml.Unmarshal(content, p)
+	if err != nil {
+		log.Errorf("error to unmarshal xml %v", err)
+		panic(fmt.Errorf("error to unmarshal xml!"))
+	}
+
+	//建立新的节点集合
+	p.Models = make([]INodeModel, 0)
+	for _, v := range p.StartNodes {
+		p.Models = append(p.Models, v)
+	}
+	for _, v := range p.EndModels {
+		p.Models = append(p.Models, v)
+	}
+	for _, v := range p.TaskModels {
+		p.Models = append(p.Models, v)
+	}
+	for _, v := range p.DecisionModels {
+		p.Models = append(p.Models, v)
+	}
+	for _, v := range p.ForkModels {
+		p.Models = append(p.Models, v)
+	}
+	for _, v := range p.JoinModels {
+		p.Models = append(p.Models, v)
+	}
+	for _, v := range p.SubProcessModels {
+		p.Models = append(p.Models, v)
+	}
+
+	//建立Node之间的关
+	for _, v := range p.Models {
+		for _, tm := range v.GetOutputs() {
+			node := p.GetNode(tm.To)
+			if node != nil {
+				node.AddInputs(tm)
+				tm.Target = node
+			}
+		}
+	}
 }
 
 //得到开始节点
@@ -52,44 +101,8 @@ func (p *ProcessModel) ContainsTaskNodeNames(nodeNames ...string) bool {
 
 //根据名称得到节点
 func (p *ProcessModel) GetNode(name string) INodeModel {
-	for _, v := range p.StartNodes {
-		if v.Name == name {
-			return v
-		}
-	}
-
-	for _, v := range p.EndModels {
-		if v.Name == name {
-			return v
-		}
-	}
-
-	for _, v := range p.TaskModels {
-		if v.Name == name {
-			return v
-		}
-	}
-
-	for _, v := range p.DecisionModels {
-		if v.Name == name {
-			return v
-		}
-	}
-
-	for _, v := range p.ForkModels {
-		if v.Name == name {
-			return v
-		}
-	}
-
-	for _, v := range p.JoinModels {
-		if v.Name == name {
-			return v
-		}
-	}
-
-	for _, v := range p.SubProcessModels {
-		if v.Name == name {
+	for _, v := range p.Models {
+		if v.GetName() == name {
 			return v
 		}
 	}

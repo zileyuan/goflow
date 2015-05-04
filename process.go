@@ -23,22 +23,24 @@ func (p *Process) GetProcessById(id string) (bool, error) {
 	return success, err
 }
 
-//得到最新的Process
-func (p *Process) GetLatestProcess(name string) (*Process, error) {
-	p.Name = name
-	processes := make([]*Process, 0)
-	err := orm.Desc("Version").Find(&processes, p)
-	if len(processes) > 0 {
-		return processes[0], err
-	} else {
-		return nil, err
-	}
-}
-
 //设定Model对象
 func (p *Process) SetModel(model *ProcessModel) {
 	p.Model = model
 	p.Name = model.Name
 	p.DisplayName = model.DisplayName
 	p.InstanceAction = model.InstanceAction
+}
+
+//得到最新的Process
+func GetLatestProcess(name string) (*Process, error) {
+	process := &Process{
+		Name: name,
+	}
+	processes := make([]*Process, 0)
+	err := orm.Desc("Version").Find(&processes, process)
+	if len(processes) > 0 {
+		return processes[0], err
+	} else {
+		return nil, err
+	}
 }
