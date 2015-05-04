@@ -8,6 +8,7 @@ type SubProcessModel struct {
 	SubProcess  *ProcessModel `xml:"-"`                //子流程Model对象
 }
 
+//执行
 func (p *SubProcessModel) Execute(execution *Execution) error {
 	return p.RunOutTransition(execution)
 }

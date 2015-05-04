@@ -1,14 +1,17 @@
 package goflow
 
+//XML合并节点
 type JoinModel struct {
 	NodeModel
 }
 
+//合并分叉节点
 func (p *JoinModel) MergeBranchHandle(execution *Execution) error {
 	activeNodes := FindActiveNodes(p)
 	return MergeHandle(execution, activeNodes)
 }
 
+//执行
 func (p *JoinModel) Execute(execution *Execution) error {
 	p.MergeBranchHandle(execution)
 	if execution.IsMerged {
@@ -17,6 +20,7 @@ func (p *JoinModel) Execute(execution *Execution) error {
 	return nil
 }
 
+//递归查找分叉节点
 func FindForkTaskNames(node INodeModel) []string {
 	ret := make([]string, 0)
 	switch node.(type) {
@@ -36,6 +40,7 @@ func FindForkTaskNames(node INodeModel) []string {
 	return ret
 }
 
+//查找分叉节点
 func FindActiveNodes(node INodeModel) []string {
 	return FindForkTaskNames(node)
 }

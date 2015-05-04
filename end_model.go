@@ -1,9 +1,11 @@
 package goflow
 
+//XML的结束节点
 type EndModel struct {
 	NodeModel
 }
 
+//执行
 func (p *EndModel) Execute(execution *Execution) error {
 	engine := execution.Engine
 	order := execution.Order

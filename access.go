@@ -13,6 +13,7 @@ import (
 
 var orm *xorm.Engine
 
+//初始化数据库ORM引擎
 func InitAccess() {
 	if orm == nil {
 		log.Info(DbDriverConnstr)
@@ -42,38 +43,42 @@ func InitAccess() {
 	}
 }
 
+//保存实体对象
 func Save(inf interface{}, id interface{}) error {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.InsertOne(inf)
 	t := reflect.TypeOf(inf)
-	log.Infof(t.Name()+" %v inserted", id)
+	log.Infof("%v %v inserted", t, id)
 	return err
 }
 
+//更新实体对象
 func Update(inf interface{}, id interface{}) error {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.Id(id).Update(inf)
 	t := reflect.TypeOf(inf)
-	log.Infof(t.Name()+" %v updated", id)
+	log.Infof("%v %v updated", t, id)
 	return err
 }
 
-func DeleteById(inf interface{}, id interface{}) error {
+//删除实体对象
+func Delete(inf interface{}, id interface{}) error {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.Id(id).Delete(inf)
 	t := reflect.TypeOf(inf)
-	log.Infof(t.Name()+" %v deleted", id)
+	log.Infof("%v %v deleted", t, id)
 	return err
 }
 
-func Delete(inf interface{}) error {
+//删除实体对象
+func DeleteObj(inf interface{}) error {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.Delete(inf)
 	t := reflect.TypeOf(inf)
-	log.Info(t.Name() + " deleted")
+	log.Info("%v deleted", t)
 	return err
 }

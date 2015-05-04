@@ -24,18 +24,21 @@ type Task struct {
 	Model        *TaskModel   `xorm:"-"`                          //Model对象
 }
 
+//根据ID得到任务
 func (p *Task) GetTaskById(id string) (bool, error) {
 	p.Id = id
 	success, err := orm.Get(p)
 	return success, err
 }
 
+//得到活动任务
 func (p *Task) GetActiveTasks() ([]*Task, error) {
 	tasks := make([]*Task, 0)
 	err := orm.Find(&tasks, p)
 	return tasks, err
 }
 
+//根据OrderID得到活动任务
 func (p *Task) GetActiveTasksByOrderId(orderId string) ([]*Task, error) {
 	p.OrderId = orderId
 	tasks := make([]*Task, 0)
@@ -43,6 +46,7 @@ func (p *Task) GetActiveTasksByOrderId(orderId string) ([]*Task, error) {
 	return tasks, err
 }
 
+//得到任务角色
 func (p *Task) GetTaskActors() ([]*TaskActor, error) {
 	taskActors := make([]*TaskActor, 0)
 	taskActor := &TaskActor{
@@ -52,6 +56,7 @@ func (p *Task) GetTaskActors() ([]*TaskActor, error) {
 	return taskActors, err
 }
 
+//得到下一个ANY类型的任务
 func GetNextAnyActiveTasks(parentTaskId string) ([]*Task, error) {
 	task := &Task{
 		ParentTaskId: parentTaskId,
@@ -61,6 +66,7 @@ func GetNextAnyActiveTasks(parentTaskId string) ([]*Task, error) {
 	return tasks, err
 }
 
+//得到下一个ALL类型的任务
 func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string) ([]*Task, error) {
 	historyTask := &HistoryTask{
 		OrderId:      orderId,
@@ -80,6 +86,7 @@ func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string)
 	return tasks, err
 }
 
+//得到活动的任务（通过SQL）
 func GetActiveTasksSQL(querystring string, args ...interface{}) ([]*Task, error) {
 	tasks := make([]*Task, 0)
 	err := orm.Where(querystring, args).Find(&tasks)

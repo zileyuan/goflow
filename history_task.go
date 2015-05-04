@@ -20,12 +20,14 @@ type HistoryTask struct {
 	TaskState    FLOW_STATUS  `xorm:"tinyint notnull"`            //任务状态
 }
 
+//根据ID得到HistoryTask
 func (p *HistoryTask) GetHistoryTaskById(id string) (bool, error) {
 	p.Id = id
 	success, err := orm.Get(p)
 	return success, err
 }
 
+//通过HistoryTask生成Task
 func (p *HistoryTask) Undo() *Task {
 	task := &Task{
 		Id:           p.Id,

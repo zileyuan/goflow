@@ -2,18 +2,21 @@ package goflow
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/lunny/log"
 )
 
+//根据OrderID得到活动流程
 func GetActiveTasksByOrderId(orderId string) []*Task {
 	task := &Task{}
 	tasks, _ := task.GetActiveTasksByOrderId(orderId)
 	return tasks
 }
 
+//得到任务的角色
 func GetTaskActors(taskModel *TaskModel, execution *Execution) []string {
 	assignee := taskModel.Assignee
 	if assignee != "" {
@@ -80,6 +83,7 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 	return tasks
 }
 
+//保存任务
 func SaveTask(task *Task, actors ...string) {
 	task.Id = NewUUID()
 	task.PerformType = PT_ANY
@@ -99,6 +103,7 @@ func CreateNewTask(taskId string, taskType TASK_TYPE, actors ...string) {
 	SaveTask(pNewTask, actors...)
 }
 
+//驳回任务
 func RejectTask(processModel *ProcessModel, currTask *Task) *Task {
 	parentTaskId := currTask.ParentTaskId
 	if parentTaskId == "" || parentTaskId == DEFAULT_START_ID {
@@ -119,6 +124,7 @@ func RejectTask(processModel *ProcessModel, currTask *Task) *Task {
 	return nil
 }
 
+//撤销任务
 func WithdrawTask(taskId string, operator string) *Task {
 	historyTask := &HistoryTask{}
 	historyTask.GetHistoryTaskById(taskId)
@@ -129,7 +135,7 @@ func WithdrawTask(taskId string, operator string) *Task {
 		tasks, _ = GetNextAllActiveTasks(historyTask.OrderId, historyTask.TaskName, historyTask.ParentTaskId)
 	}
 	for _, task := range tasks {
-		DeleteById(task, task.Id)
+		Delete(task, task.Id)
 	}
 
 	task := historyTask.Undo()
@@ -140,6 +146,7 @@ func WithdrawTask(taskId string, operator string) *Task {
 	return task
 }
 
+//加任务角色
 func AddTaskActor(taskId string, performType PERFORM_TYPE, actors ...string) {
 	task := &Task{}
 	task.GetTaskById(taskId)
@@ -166,6 +173,7 @@ func AddTaskActor(taskId string, performType PERFORM_TYPE, actors ...string) {
 	}
 }
 
+//删除任务角色
 func RemoveTaskActor(taskId string, actors ...string) {
 	task := &Task{}
 	task.GetTaskById(taskId)
@@ -175,7 +183,7 @@ func RemoveTaskActor(taskId string, actors ...string) {
 				TaskId:  taskId,
 				ActorId: actorId,
 			}
-			Delete(taskActor)
+			DeleteObj(taskActor)
 		}
 		v := JsonToMap(task.Variable)
 		oldActors := strings.Split(v[DEFAULT_KEY_ACTOR].(string), ",")
@@ -193,6 +201,7 @@ func RemoveTaskActor(taskId string, actors ...string) {
 	}
 }
 
+//结束并且提取任务
 func TakeTask(taskId string, operator string) *Task {
 	task := &Task{}
 	success, err := task.GetTaskById(taskId)
@@ -233,6 +242,7 @@ func AssignTask(taskId string, actors ...string) {
 	}
 }
 
+//是否被授权执行任务
 func IsAllowed(task *Task, operator string) bool {
 	if operator == string(ER_ADMIN) || operator == string(ER_AUTO) || task.Operator == operator {
 		return true
@@ -242,6 +252,7 @@ func IsAllowed(task *Task, operator string) bool {
 	}
 }
 
+//完成任务
 func CompleteTask(taskId string, operator string, args map[string]interface{}) *Task {
 	task := new(Task)
 	task.GetTaskById(taskId)
@@ -263,23 +274,58 @@ func CompleteTask(taskId string, operator string, args map[string]interface{}) *
 			TaskState:    FS_FINISH,
 		}
 		Save(historyTask, historyTask.Id)
-		DeleteById(task, task.Id)
+		Delete(task, task.Id)
+
+		taskActors, _ := GetTaskActorsByTaskId(historyTask.Id)
+		for _, taskActor := range taskActors {
+			historyTaskActor := &HistoryTaskActor{
+				Id:      taskActor.Id,
+				TaskId:  taskActor.TaskId,
+				ActorId: taskActor.ActorId,
+			}
+			Save(historyTaskActor, historyTaskActor.Id)
+			Delete(taskActor, taskActor.Id)
+		}
 	}
 	return task
 }
 
-func CreateOrder(process *Process, operator string) *Order {
-	//model := process.Model
+//创建Order
+func CreateOrder(process *Process, operator string, args map[string]interface{},
+	parentId string, parentNodeName string) *Order {
+	now := time.Now()
 	order := &Order{
-		Id:         NewUUID(),
-		ProcessId:  process.Id,
-		Creator:    operator,
-		CreateTime: time.Now(),
+		Id:             NewUUID(),
+		ParentId:       parentId,
+		ParentNodeName: parentNodeName,
+		ProcessId:      process.Id,
+		Creator:        operator,
+		CreateTime:     now,
+		LastUpdateTime: now,
+		LastUpdator:    operator,
+		Variable:       MapToJson(args),
 	}
-
+	model := process.Model
+	if model != nil {
+		order.ExpireTime = model.ExpireTime
+		orderNo := args[string(ER_ORDERNO)]
+		if orderNo != nil && orderNo.(string) != "" {
+			order.OrderNo = orderNo.(string)
+		} else {
+			order.OrderNo = GenerateNo()
+		}
+	}
+	SaveOrder(order)
 	return order
 }
 
+//生成OrderNo
+func GenerateNo() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return fmt.Sprintf("%s_%04d", FormatTime(time.Now(), TIME_LAYOUT), r.Intn(1000))
+}
+
+//保存Order
 func SaveOrder(order *Order) {
 	historyOrder := new(HistoryOrder)
 	historyOrder.DataByOrder(order)
@@ -289,6 +335,7 @@ func SaveOrder(order *Order) {
 	Save(historyOrder, historyOrder.Id)
 }
 
+//完成Order
 func CompleteOrder(id string) {
 	order := new(Order)
 	order.GetOrderById(id)
@@ -298,9 +345,10 @@ func CompleteOrder(id string) {
 	historyOrder.OrderState = FS_FINISH
 
 	Update(historyOrder, historyOrder.Id)
-	DeleteById(order, order.Id)
+	Delete(order, order.Id)
 }
 
+//唤醒Order
 func ResumeOrder(id string) {
 	historyOrder := new(HistoryOrder)
 	historyOrder.GetHistoryOrderById(id)
@@ -312,6 +360,7 @@ func ResumeOrder(id string) {
 
 }
 
+//终止Order
 func TerminateOrder(id string, operator string) {
 	tasks := GetActiveTasksByOrderId(id)
 	for _, task := range tasks {
@@ -326,5 +375,5 @@ func TerminateOrder(id string, operator string) {
 	historyOrder.FinishTime = time.Now()
 
 	Update(historyOrder, historyOrder.Id)
-	DeleteById(order, order.Id)
+	Delete(order, order.Id)
 }

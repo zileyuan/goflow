@@ -6,11 +6,13 @@ import (
 	"github.com/Knetic/govaluate"
 )
 
+//XML决策节点
 type DecisionModel struct {
 	NodeModel
-	Expr string `xml:"expr,attr"` //变迁的条件表达式
+	Expr string `xml:"expr,attr"` //决策的条件表达式
 }
 
+//执行
 func (p *DecisionModel) Execute(execution *Execution) error {
 	expression, _ := govaluate.NewEvaluableExpression(p.Expr)
 	next, _ := expression.Evaluate(execution.Args)

@@ -8,23 +8,26 @@ import (
 	"github.com/lunny/log"
 )
 
+//流程服务
 type ProcessService struct {
 	ProcessCache map[string]*Process
 	NameCache    map[string]string
 }
 
+//初始化服务对象
 func (p *ProcessService) InitProcessService() {
 	p.ProcessCache = make(map[string]*Process)
 	p.NameCache = make(map[string]string)
 }
 
+//缓存Process
 func (p *ProcessService) Cache(process *Process) {
 
 	processName := process.Name + DEFAULT_SEPARATOR + IntToStr(process.Version)
 	delete(p.ProcessCache, processName)
 
 	var pm ProcessModel
-	err := xml.Unmarshal(process.Content, &pm)
+	err := xml.Unmarshal([]byte(process.Content), &pm)
 
 	if err != nil {
 		log.Errorf("error to unmarshal xml %v", err)
@@ -37,11 +40,13 @@ func (p *ProcessService) Cache(process *Process) {
 	p.NameCache[process.Id] = processName
 }
 
+//部署Process
 func (p *ProcessService) Deploy(input []byte, creator string) string {
 
 	process := &Process{
+		Id:         NewUUID(),
 		State:      FS_ACTIVITY,
-		Content:    input,
+		Content:    string(input),
 		Creator:    creator,
 		CreateTime: time.Now(),
 	}
@@ -51,6 +56,7 @@ func (p *ProcessService) Deploy(input []byte, creator string) string {
 	return process.Id
 }
 
+//重新部署Process
 func (p *ProcessService) ReDeploy(id string, input []byte) {
 	process := new(Process)
 	success, err := process.GetProcessById(id)
@@ -60,7 +66,7 @@ func (p *ProcessService) ReDeploy(id string, input []byte) {
 	}
 
 	if success {
-		process.Content = input
+		process.Content = string(input)
 		p.Cache(process)
 		Update(process, process.Id)
 	} else {
@@ -68,6 +74,7 @@ func (p *ProcessService) ReDeploy(id string, input []byte) {
 	}
 }
 
+//卸载部署
 func (p *ProcessService) UnDeploy(id string) {
 	process := new(Process)
 	success, err := process.GetProcessById(id)
@@ -85,6 +92,7 @@ func (p *ProcessService) UnDeploy(id string) {
 	}
 }
 
+//根据ID得到Process
 func (p *ProcessService) GetProcessById(id string) *Process {
 	processName := p.NameCache[id]
 	process := p.ProcessCache[processName]
@@ -97,6 +105,7 @@ func (p *ProcessService) GetProcessById(id string) *Process {
 	return process
 }
 
+//根据名称、版本得到Process
 func (p *ProcessService) GetProcessByVersion(name string, version int) *Process {
 	dbProcess := &Process{}
 	if version == -1 {

@@ -2,6 +2,7 @@ package goflow
 
 import "fmt"
 
+//XML变迁节点元素
 type TransitionModel struct {
 	BaseModel
 	Source  INodeModel `xml:"-"`         //变迁的源节点引用
@@ -11,6 +12,7 @@ type TransitionModel struct {
 	Enabled bool       `xml:"-"`         //当前变迁路径是否可用
 }
 
+//执行
 func (p *TransitionModel) Execute(execution *Execution) error {
 	if p.Enabled {
 		switch p.Target.(type) {

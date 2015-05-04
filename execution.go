@@ -1,5 +1,6 @@
 package goflow
 
+//流程执行体
 type Execution struct {
 	Engine         *Engine                //引擎
 	Process        *Process               //流程定义对象

@@ -12,16 +12,18 @@ type Process struct {
 	State          FLOW_STATUS   `xorm:"tinyint"`                //状态
 	CreateTime     time.Time     `xorm:"datetime"`               //创建时间
 	Creator        string        `xorm:"varchar(36)"`            //创建人
-	Content        []byte        `xorm:"text"`                   //流程定义XML
+	Content        string        `xorm:"text"`                   //流程定义XML
 	Model          *ProcessModel `xorm:"-"`                      //Model对象
 }
 
+//根据ID得到Process
 func (p *Process) GetProcessById(id string) (bool, error) {
 	p.Id = id
 	success, err := orm.Get(p)
 	return success, err
 }
 
+//得到最新的Process
 func (p *Process) GetLatestProcess(name string) (*Process, error) {
 	p.Name = name
 	processes := make([]*Process, 0)
@@ -33,6 +35,7 @@ func (p *Process) GetLatestProcess(name string) (*Process, error) {
 	}
 }
 
+//设定Model对象
 func (p *Process) SetModel(model *ProcessModel) {
 	p.Model = model
 	p.Name = model.Name

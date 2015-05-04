@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+//XML流程定义的任务节点
 type TaskModel struct {
 	WorkModel
 	Assignee    string       `xml:"assignee,attr"`    //参与者变量名称
@@ -13,6 +14,7 @@ type TaskModel struct {
 	ExpireTime  time.Time    `xml:"-"`                //期望完成时间
 }
 
+//执行
 func (p *TaskModel) Execute(execution *Execution) error {
 	if p.PerformType == PT_ANY {
 		p.RunOutTransition(execution)
@@ -25,12 +27,14 @@ func (p *TaskModel) Execute(execution *Execution) error {
 	return nil
 }
 
+//根据任务节点创建任务对象
 func CreateHandle(tm *TaskModel, execution *Execution) error {
 	tasks := CreateTask(tm, execution)
 	execution.Tasks = append(execution.Tasks, tasks...)
 	return nil
 }
 
+//合并任务角色的处理
 func MergeActorHandle(tm *TaskModel, execution *Execution) error {
 	activeNodes := []string{tm.Name}
 	return MergeHandle(execution, activeNodes)

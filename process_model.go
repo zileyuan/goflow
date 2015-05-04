@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-//流程定义process元素
+//XML定义process节点元素
 type ProcessModel struct {
 	BaseModel
 	StartNodes       []*StartModel      `xml:"start"`               //开始节点
@@ -18,6 +18,7 @@ type ProcessModel struct {
 	ExpireTime       time.Time          `xml:"expireTime,attr"`     //期望完成时间
 }
 
+//得到开始节点
 func (p *ProcessModel) GetStart() *StartModel {
 	if len(p.StartNodes) > 0 {
 		return p.StartNodes[0]
@@ -25,6 +26,7 @@ func (p *ProcessModel) GetStart() *StartModel {
 	return nil
 }
 
+//根据任务名，是否包含子流程
 func (p *ProcessModel) ContainsSubProcessNodeNames(nodeNames ...string) bool {
 	for _, node := range p.SubProcessModels {
 		for _, nodeName := range nodeNames {
@@ -36,6 +38,7 @@ func (p *ProcessModel) ContainsSubProcessNodeNames(nodeNames ...string) bool {
 	return false
 }
 
+//根据任务名，是否包含任务
 func (p *ProcessModel) ContainsTaskNodeNames(nodeNames ...string) bool {
 	for _, node := range p.TaskModels {
 		for _, nodeName := range nodeNames {
@@ -47,6 +50,7 @@ func (p *ProcessModel) ContainsTaskNodeNames(nodeNames ...string) bool {
 	return false
 }
 
+//根据名称得到节点
 func (p *ProcessModel) GetNode(name string) INodeModel {
 	for _, v := range p.StartNodes {
 		if v.Name == name {

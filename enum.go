@@ -1,9 +1,12 @@
 package goflow
 
+//特性的关键字
 const (
 	DEFAULT_SEPARATOR = "."                                    //默认分割符
-	DEFAULT_KEY_ACTOR = "SPECIFY_ACTOR"                        //actor
+	DEFAULT_KEY_ACTOR = "SPECIFY_ACTOR"                        //指定的actor
 	DEFAULT_START_ID  = "00000000-0000-0000-0000-000000000000" //start node
+	TIME_LAYOUT       = "2006-01-02_15:04:05.000"              //时间格式
+
 )
 
 //流程可用的开关,包含Process、Order、Task
@@ -15,6 +18,7 @@ const (
 	FS_TERMINATION                    //终止状态
 )
 
+//委托代理的状态
 type SURROGATE_STATUS int
 
 const (
@@ -28,7 +32,6 @@ type TASK_TYPE string
 const (
 	TT_MAJOR  TASK_TYPE = "MAJOR"  //主办任务
 	TT_ASSIST TASK_TYPE = "ASSIST" //协办任务
-	TT_RECORD TASK_TYPE = "RECORD" //仅仅记录
 )
 
 //任务参与方式

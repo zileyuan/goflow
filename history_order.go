@@ -17,6 +17,7 @@ type HistoryOrder struct {
 	FinishTime time.Time   `xorm:"datetime"`                  //完成时间
 }
 
+//从Order对象获取数据构件HistoryOrder
 func (p *HistoryOrder) DataByOrder(order *Order) {
 	p.Id = order.Id
 	p.ProcessId = order.ProcessId
@@ -29,12 +30,14 @@ func (p *HistoryOrder) DataByOrder(order *Order) {
 	p.Variable = order.Variable
 }
 
+//根据ID得到HistoryOrder
 func (p *HistoryOrder) GetHistoryOrderById(id string) (bool, error) {
 	p.Id = id
 	success, err := orm.Get(p)
 	return success, err
 }
 
+//通过HistoryOrder生成Order
 func (p *HistoryOrder) Undo() *Order {
 	order := &Order{
 		Id:             p.Id,

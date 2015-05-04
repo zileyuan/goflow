@@ -2,20 +2,24 @@ package goflow
 
 import "strings"
 
+//XML节点通用信息
 type NodeModel struct {
 	BaseModel
 	Inputs  []*TransitionModel `xml:"-"`          //输入变迁集合
 	Outputs []*TransitionModel `xml:"transition"` //输出变迁集合
 }
 
+//得到输入变迁
 func (p *NodeModel) GetInputs() []*TransitionModel {
 	return p.Inputs
 }
 
+//得到输出变迁
 func (p *NodeModel) GetOutputs() []*TransitionModel {
 	return p.Outputs
 }
 
+//运行变迁
 func (p *NodeModel) RunOutTransition(execution *Execution) error {
 	for _, tm := range p.Outputs {
 		tm.Enabled = true
@@ -27,6 +31,7 @@ func (p *NodeModel) RunOutTransition(execution *Execution) error {
 	return nil
 }
 
+//合并处理通用流程
 func MergeHandle(execution *Execution, activeNodes []string) error {
 	processModel := execution.Process.Model
 
@@ -45,6 +50,7 @@ func MergeHandle(execution *Execution, activeNodes []string) error {
 	return nil
 }
 
+//能否驳回
 func CanRejected(currentNode INodeModel, parentNode INodeModel) bool {
 	switch parentNode.(type) {
 	case *TaskModel:

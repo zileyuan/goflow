@@ -19,12 +19,14 @@ type Order struct {
 	Variable       string    `xorm:"varchar(2000)"`             //流程实例附属变量
 }
 
+//根据ID得到Order
 func (p *Order) GetOrderById(id string) (bool, error) {
 	p.Id = id
 	success, err := orm.Get(p)
 	return success, err
 }
 
+//得到活动的Order（通过SQL）
 func GetActiveOrdersSQL(querystring string, args ...interface{}) ([]*Order, error) {
 	orders := make([]*Order, 0)
 	err := orm.Where(querystring, args).Find(&orders)

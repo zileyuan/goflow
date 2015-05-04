@@ -6,6 +6,7 @@ import (
 	"github.com/Knetic/govaluate"
 )
 
+//测试表达式
 func TestExpression(t *testing.T) {
 	expression1, _ := govaluate.NewEvaluableExpression("content")
 	parameters1 := make(map[string]interface{})
@@ -32,6 +33,7 @@ func TestExpression(t *testing.T) {
 	t.Logf("next4 %v", next4)
 }
 
+//测试参与方式ALL
 func TestActorAll(t *testing.T) {
 	bytes := LoadXML("res/actorall.xml")
 	engine := NewEngine()
@@ -43,6 +45,7 @@ func TestActorAll(t *testing.T) {
 	t.Logf("OrderId %s", order.Id)
 }
 
+//测试分叉和合并
 func TestForkJoin(t *testing.T) {
 	bytes := LoadXML("res/forkjoin.xml")
 	engine := NewEngine()
@@ -60,6 +63,7 @@ func TestForkJoin(t *testing.T) {
 	}
 }
 
+//测试决策1
 func TestDecision1(t *testing.T) {
 	bytes := LoadXML("res/decision1.xml")
 	engine := NewEngine()
@@ -73,6 +77,7 @@ func TestDecision1(t *testing.T) {
 	t.Logf("OrderId %s", order.Id)
 }
 
+//测试决策2
 func TestDecision2(t *testing.T) {
 	bytes := LoadXML("res/decision2.xml")
 	engine := NewEngine()
@@ -88,6 +93,7 @@ func TestDecision2(t *testing.T) {
 	t.Logf("OrderId %s", order.Id)
 }
 
+//简单测试
 func TestSimple(t *testing.T) {
 	bytes := LoadXML("res/simple.xml")
 	engine := NewEngine()
@@ -102,6 +108,7 @@ func TestSimple(t *testing.T) {
 	t.Logf("OrderId %s", order.Id)
 }
 
+//测试参与方式-辅助
 func TestAssist(t *testing.T) {
 	bytes := LoadXML("res/assist.xml")
 	engine := NewEngine()
@@ -113,6 +120,7 @@ func TestAssist(t *testing.T) {
 	}
 }
 
+//测试子流程1
 func TestSubProcess1(t *testing.T) {
 	engine := NewEngine()
 	bytes := LoadXML("res/subprocess.child.xml")
@@ -132,6 +140,7 @@ func TestSubProcess1(t *testing.T) {
 	}
 }
 
+//测试子流程2
 func TestSubProcess2(t *testing.T) {
 	engine := NewEngine()
 	bytes := LoadXML("res/subprocess.child.xml")
@@ -151,6 +160,7 @@ func TestSubProcess2(t *testing.T) {
 	}
 }
 
+//测试小组
 func TestGroup(t *testing.T) {
 	bytes := LoadXML("res/group.xml")
 	engine := NewEngine()
@@ -166,6 +176,7 @@ func TestGroup(t *testing.T) {
 	}
 }
 
+//测试权限
 func TestRight(t *testing.T) {
 	bytes := LoadXML("res/right.xml")
 	engine := NewEngine()
@@ -181,6 +192,7 @@ func TestRight(t *testing.T) {
 	}
 }
 
+//测试任务提取
 func TestTake(t *testing.T) {
 	bytes := LoadXML("res/take.xml")
 	engine := NewEngine()

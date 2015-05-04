@@ -22,6 +22,7 @@ var (
 	DbDatebase      string
 )
 
+//系统配置文件初始化（包含运行模式和数据库）
 func init() {
 	var err error
 	Cfg, err = goconfig.LoadConfigFile(CfgPath)
