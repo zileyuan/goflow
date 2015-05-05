@@ -1,6 +1,7 @@
 package goflow
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -22,6 +23,7 @@ func (p *Engine) StartInstanceById(id string, operator string, args map[string]i
 //通过流程NAME开始实例
 func (p *Engine) StartInstanceByName(name string, version int, operator string, args map[string]interface{}) *Order {
 	process := p.GetProcessByVersion(name, version)
+	fmt.Printf("StartInstanceByName %v", process.Id)
 	return p.StartProcess(process, operator, args)
 }
 
@@ -54,6 +56,7 @@ func (p *Engine) ExecuteByProcess(process *Process, operator string, args map[st
 		Process:  process,
 		Order:    order,
 		Operator: operator,
+		Args:     args,
 	}
 	return execution
 }

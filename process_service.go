@@ -44,7 +44,7 @@ func (p *ProcessService) Deploy(input []byte, creator string) string {
 
 	ver := -1
 	oldProcess, _ := GetLatestProcess(processModel.Name)
-	if oldProcess == nil {
+	if oldProcess != nil {
 		ver = oldProcess.Version
 	}
 
@@ -114,18 +114,30 @@ func (p *ProcessService) GetProcessById(id string) *Process {
 
 //根据名称、版本得到Process
 func (p *ProcessService) GetProcessByVersion(name string, version int) *Process {
-	var dbProcess *Process
-	if version == -1 {
+	ver := version
+	if ver == -1 {
 		dbProcess, _ := GetLatestProcess(name)
 		if dbProcess == nil {
 			return nil
+		} else {
+			ver = dbProcess.Version
 		}
 	}
-	processName := name + DEFAULT_SEPARATOR + IntToStr(dbProcess.Version)
+	processName := name + DEFAULT_SEPARATOR + IntToStr(ver)
 	process := p.ProcessCache[processName]
 	if process == nil {
-		process = dbProcess
-		p.Cache(process)
+		process = &Process{
+			Name:    name,
+			Version: ver,
+		}
+		success, _ := process.GetProcess()
+		if success {
+			p.Cache(process)
+			return process
+		} else {
+			return nil
+		}
+	} else {
+		return process
 	}
-	return process
 }

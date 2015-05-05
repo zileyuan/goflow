@@ -42,10 +42,13 @@ func LoadXML(xmlFile string) []byte {
 
 //map转json
 func MapToJson(v map[string]interface{}) string {
+	if v == nil {
+		return ""
+	}
 	js := simplejson.New()
 	js.Set("map", v)
-	ret, _ := js.Get("map").String()
-	return ret
+	ret, _ := js.Get("map").Encode()
+	return string(ret)
 }
 
 //json转map

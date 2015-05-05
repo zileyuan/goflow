@@ -23,6 +23,12 @@ func (p *Process) GetProcessById(id string) (bool, error) {
 	return success, err
 }
 
+//根据Process本身条件得到Process
+func (p *Process) GetProcess() (bool, error) {
+	success, err := orm.Get(p)
+	return success, err
+}
+
 //设定Model对象
 func (p *Process) SetModel(model *ProcessModel) {
 	p.Model = model
