@@ -4,7 +4,7 @@
         <transition name="transition1" to="task1"/>
     </start>
 	<end displayName="end1" name="end1"/>
-    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY" taskType="MAJOR">
         <transition name="transition2" to="end1"/>
     </task>   
 </process>

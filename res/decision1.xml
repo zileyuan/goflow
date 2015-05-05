@@ -9,13 +9,13 @@
         <transition displayName="to task1" name="toTask1" to="task1"/>
         <transition displayName="to task3" name="toTask3" to="task3"/>
     </decision>
-    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY" taskType="MAJOR">
         <transition name="transition5" to="end1"/>
     </task>
-    <task assignee="task2.operator" displayName="task2" name="task2" performType="ANY">
+    <task assignee="task2.operator" displayName="task2" name="task2" performType="ANY" taskType="MAJOR">
         <transition name="transition6" to="end1"/>
     </task>
-    <task assignee="task3.operator" displayName="task3" name="task3" performType="ANY">
+    <task assignee="task3.operator" displayName="task3" name="task3" performType="ANY" taskType="MAJOR">
         <transition name="transition7" to="end1"/>
     </task> 
 </process>

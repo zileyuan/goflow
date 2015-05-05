@@ -4,10 +4,10 @@
         <transition name="transition1" to="task1"/>
     </start>
     <end displayName="end1" name="end1"/>
-    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY" taskType="MAJOR">
         <transition name="transition2" to="subprocess1"/>
     </task>
-    <subprocess displayName="subprocess1" name="subprocess1" processName="child">
+    <subprocess displayName="subprocess1" name="subprocess1" processName="child" >
         <transition name="transition3" to="end1"/>
     </subprocess>
 </process>

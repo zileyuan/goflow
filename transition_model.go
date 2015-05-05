@@ -18,7 +18,7 @@ func (p *TransitionModel) Execute(execution *Execution) error {
 		switch p.Target.(type) {
 		case *TaskModel:
 			taskModel := p.Target.(*TaskModel)
-			CreateHandle(taskModel, execution)
+			CreateTaskHandle(taskModel, execution)
 			return nil
 		case *SubProcessModel:
 			subProcessModel := p.Target.(*SubProcessModel)

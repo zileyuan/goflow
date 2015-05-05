@@ -12,13 +12,13 @@
     <join displayName="join1" name="join1">
         <transition name="transition2" to="end1"/>
     </join>
-    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY">
+    <task assignee="task1.operator" displayName="task1" name="task1" performType="ANY" taskType="MAJOR">
         <transition name="transition6" to="join1"/>
     </task>
-    <task assignee="task2.operator" displayName="task2" name="task2" performType="ANY">
+    <task assignee="task2.operator" displayName="task2" name="task2" performType="ANY" taskType="MAJOR">
         <transition name="transition7" to="join2"/>
     </task>
-    <task assignee="task3.operator" displayName="task3" name="task3" performType="ANY">
+    <task assignee="task3.operator" displayName="task3" name="task3" performType="ANY" taskType="MAJOR">
         <transition name="transition8" to="join2"/>
     </task>
     <join displayName="join2" name="join2">

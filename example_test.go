@@ -81,7 +81,7 @@ func TestDecision1(t *testing.T) {
 
 	args := map[string]interface{}{
 		"task2.operator": []string{"1"},
-		"content":        250.0,
+		"content":        "toTask2",
 	}
 	order := engine.StartInstanceById(processId, "2", args)
 	t.Logf("OrderId %s", order.Id)
@@ -129,9 +129,7 @@ func TestAssist(t *testing.T) {
 	bytes := LoadXML("res/assist.xml")
 	engine := NewEngine()
 	engine.Deploy(bytes, "")
-	args := map[string]interface{}{
-		"content": 250.0,
-	}
+	args := map[string]interface{}{}
 	order := engine.StartInstanceByName("assist", -1, "2", args)
 	tasks := GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
@@ -193,7 +191,7 @@ func TestGroup(t *testing.T) {
 	args := map[string]interface{}{
 		"task1.operator": []string{"role1"},
 	}
-	order := engine.StartInstanceByName("group", 0, "2", args)
+	order := engine.StartInstanceByName("group", -1, "2", args)
 	t.Logf("OrderId %s", order.Id)
 	tasks := GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {

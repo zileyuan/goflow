@@ -28,7 +28,7 @@ func (p *TaskModel) Execute(execution *Execution) error {
 }
 
 //根据任务节点创建任务对象
-func CreateHandle(tm *TaskModel, execution *Execution) {
+func CreateTaskHandle(tm *TaskModel, execution *Execution) {
 	tasks := CreateTask(tm, execution)
 	execution.Tasks = append(execution.Tasks, tasks...)
 }
