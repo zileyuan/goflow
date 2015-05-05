@@ -36,7 +36,7 @@ func (p *NodeModel) RunOutTransition(execution *Execution) error {
 }
 
 //合并处理通用流程
-func MergeHandle(execution *Execution, activeNodes []string) error {
+func MergeHandle(execution *Execution, activeNodes []string) {
 	processModel := execution.Process.Model
 
 	isSubProcessMerged := false
@@ -51,7 +51,6 @@ func MergeHandle(execution *Execution, activeNodes []string) error {
 		isTaskMerged = len(tasks) == 0
 	}
 	execution.IsMerged = isSubProcessMerged && isTaskMerged
-	return nil
 }
 
 //能否驳回

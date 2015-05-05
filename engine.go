@@ -25,6 +25,16 @@ func (p *Engine) StartInstanceByName(name string, version int, operator string, 
 	return p.StartProcess(process, operator, args)
 }
 
+//通过执行体Execution开始实例
+func (p *Engine) StartInstanceByExecution(execution *Execution) *Order {
+	process := execution.Process
+	start := process.Model.GetStart()
+	current := p.ExecuteByProcess(process, execution.Operator, execution.Args,
+		execution.ParentOrder.Id, execution.ParentNodeName)
+	start.Execute(current)
+	return current.Order
+}
+
 //开始流程
 func (p *Engine) StartProcess(process *Process, operator string, args map[string]interface{}) *Order {
 	execution := p.ExecuteByProcess(process, operator, args, "", "")

@@ -6,9 +6,9 @@ type JoinModel struct {
 }
 
 //合并分叉节点
-func (p *JoinModel) MergeBranchHandle(execution *Execution) error {
+func (p *JoinModel) MergeBranchHandle(execution *Execution) {
 	activeNodes := FindActiveNodes(p)
-	return MergeHandle(execution, activeNodes)
+	MergeHandle(execution, activeNodes)
 }
 
 //执行

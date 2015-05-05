@@ -28,14 +28,13 @@ func (p *TaskModel) Execute(execution *Execution) error {
 }
 
 //根据任务节点创建任务对象
-func CreateHandle(tm *TaskModel, execution *Execution) error {
+func CreateHandle(tm *TaskModel, execution *Execution) {
 	tasks := CreateTask(tm, execution)
 	execution.Tasks = append(execution.Tasks, tasks...)
-	return nil
 }
 
 //合并任务角色的处理
-func MergeActorHandle(tm *TaskModel, execution *Execution) error {
+func MergeActorHandle(tm *TaskModel, execution *Execution) {
 	activeNodes := []string{tm.Name}
-	return MergeHandle(execution, activeNodes)
+	MergeHandle(execution, activeNodes)
 }
