@@ -304,16 +304,15 @@ func CreateOrder(process *Process, operator string, args map[string]interface{},
 		LastUpdateTime: now,
 		LastUpdator:    operator,
 		Variable:       MapToJson(args),
+		OrderNo:        GenerateNo(),
+	}
+	orderNo := args[string(ER_ORDERNO)]
+	if orderNo != nil && orderNo.(string) != "" {
+		order.OrderNo = orderNo.(string)
 	}
 	model := process.Model
 	if model != nil {
 		order.ExpireTime = model.ExpireTime
-		orderNo := args[string(ER_ORDERNO)]
-		if orderNo != nil && orderNo.(string) != "" {
-			order.OrderNo = orderNo.(string)
-		} else {
-			order.OrderNo = GenerateNo()
-		}
 	}
 	SaveOrder(order)
 	return order

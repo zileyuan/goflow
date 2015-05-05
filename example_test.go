@@ -129,14 +129,11 @@ func TestAssist(t *testing.T) {
 	bytes := LoadXML("res/assist.xml")
 	engine := NewEngine()
 	engine.Deploy(bytes, "")
-	fmt.Printf("--- TestAssist 0 ---")
 	args := map[string]interface{}{
 		"content": 250.0,
 	}
 	order := engine.StartInstanceByName("assist", -1, "2", args)
-	fmt.Printf("--- TestAssist 1 ---")
 	tasks := GetActiveTasksByOrderId(order.Id)
-	fmt.Printf("--- TestAssist 2 ---")
 	for _, task := range tasks {
 		CreateNewTask(task.Id, TT_ASSIST, "test")
 	}
