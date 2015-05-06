@@ -14,7 +14,8 @@ import (
 var orm *xorm.Engine
 
 //初始化数据库ORM引擎
-func InitAccessByXorm(orm *xorm.Engine) {
+func InitAccessByXorm(xorm *xorm.Engine) {
+	orm = xorm
 	//orm.DumpAllToFile("./db_struct.sql")
 	orm.Sync2(new(HistoryOrder), new(HistoryTask), new(HistoryTaskActor),
 		new(Order), new(Process), new(Surrogate), new(Task), new(TaskActor), new(CCOrder))
