@@ -23,7 +23,7 @@ type ProcessModel struct {
 	Models           []INodeModel       `xml:"-"`                   //上面所有Node节点(Start\End\Task\Decision\Fork\Join\SubProcess)的集合
 }
 
-func (p *ProcessModel) BuildRelationship(content []byte) {
+func (p *ProcessModel) BuildRelationship(content []byte, processService *ProcessService) {
 	//解析xml内容
 	err := xml.Unmarshal(content, p)
 	if err != nil {
@@ -64,6 +64,7 @@ func (p *ProcessModel) BuildRelationship(content []byte) {
 				tm.Target = node
 			}
 		}
+		v.BuildInterceptors(processService)
 	}
 }
 

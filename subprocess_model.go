@@ -8,8 +8,10 @@ type SubProcessModel struct {
 }
 
 //执行
-func (p *SubProcessModel) Execute(execution *Execution) error {
-	return p.RunOutTransition(execution)
+func (p *SubProcessModel) Execute(execution *Execution) {
+	p.PrevIntercept(execution)
+	p.RunOutTransition(execution)
+	p.PostIntercept(execution)
 }
 
 //开始子流程处理

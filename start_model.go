@@ -6,6 +6,8 @@ type StartModel struct {
 }
 
 //执行
-func (p *StartModel) Execute(execution *Execution) error {
-	return p.RunOutTransition(execution)
+func (p *StartModel) Execute(execution *Execution) {
+	p.PrevIntercept(execution)
+	p.RunOutTransition(execution)
+	p.PostIntercept(execution)
 }

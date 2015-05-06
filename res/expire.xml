@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process displayName="测试时限控制" name="expire">
+    <start displayName="start1" name="start1">
+        <transition name="transition1" to="task1"/>
+    </start>
+    <end displayName="end1" name="end1"/>
+    <task assignee="task1.operator" autoExecute="true" callback="test.time.expire.TestCallback" displayName="task1"
+          expireTime="task1.expireTime" name="task1" performType="ANY" reminderRepeat="1" reminderTime="task1.reminderTime">
+        <transition name="transition2" to="end1"/>
+    </task>  
+</process>

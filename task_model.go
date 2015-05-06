@@ -1,8 +1,6 @@
 package goflow
 
-import (
-	"time"
-)
+import "time"
 
 //XML流程定义的任务节点
 type TaskModel struct {
@@ -14,8 +12,7 @@ type TaskModel struct {
 	ExpireTime  time.Time    `xml:"-"`                //期望完成时间
 }
 
-//执行
-func (p *TaskModel) Execute(execution *Execution) error {
+func (p *TaskModel) Exec(execution *Execution) {
 	if p.PerformType == PT_ANY {
 		p.RunOutTransition(execution)
 	} else {
@@ -24,7 +21,14 @@ func (p *TaskModel) Execute(execution *Execution) error {
 			p.RunOutTransition(execution)
 		}
 	}
-	return nil
+}
+
+//执行
+func (p *TaskModel) Execute(execution *Execution) {
+	p.PrevIntercept(execution)
+	p.Exec(execution)
+	p.PostIntercept(execution)
+
 }
 
 //根据任务节点创建任务对象

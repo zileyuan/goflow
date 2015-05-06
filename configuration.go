@@ -6,10 +6,6 @@ import (
 	"github.com/Unknwon/goconfig"
 )
 
-const (
-	CfgPath = "conf/app.conf"
-)
-
 var (
 	Cfg             *goconfig.ConfigFile
 	RunMode         string
@@ -23,19 +19,21 @@ var (
 )
 
 //系统配置文件初始化（包含运行模式和数据库）
-func init() {
-	var err error
-	Cfg, err = goconfig.LoadConfigFile(CfgPath)
-	if err != nil {
-		panic(fmt.Errorf("fail to load config file '%s': %v", CfgPath, err))
-	}
+func InitConfig(cfg string) {
+	if Cfg == nil {
+		var err error
+		Cfg, err = goconfig.LoadConfigFile(cfg)
+		if err != nil {
+			panic(fmt.Errorf("fail to load config file '%s': %v", cfg, err))
+		}
 
-	RunMode = Cfg.MustValue("app", "run_mode", "dev")
-	DbDriver = Cfg.MustValue(RunMode, "db_driver")
-	DbDriverConnstr = Cfg.MustValue(RunMode, "db_driver_connstr")
-	DbUsername = Cfg.MustValue(RunMode, "db_username")
-	DbPassword = Cfg.MustValue(RunMode, "db_password")
-	DbServer = Cfg.MustValue(RunMode, "db_server")
-	DbDatebase = Cfg.MustValue(RunMode, "db_datebase")
-	DbPort = Cfg.MustInt(RunMode, "db_port")
+		RunMode = Cfg.MustValue("app", "run_mode", "dev")
+		DbDriver = Cfg.MustValue(RunMode, "db_driver")
+		DbDriverConnstr = Cfg.MustValue(RunMode, "db_driver_connstr")
+		DbUsername = Cfg.MustValue(RunMode, "db_username")
+		DbPassword = Cfg.MustValue(RunMode, "db_password")
+		DbServer = Cfg.MustValue(RunMode, "db_server")
+		DbDatebase = Cfg.MustValue(RunMode, "db_datebase")
+		DbPort = Cfg.MustInt(RunMode, "db_port")
+	}
 }

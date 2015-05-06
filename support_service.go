@@ -44,7 +44,7 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 	args[DEFAULT_KEY_ACTOR] = actors
 
 	task := &Task{
-		Id:          execution.Order.Id,
+		OrderId:     execution.Order.Id,
 		TaskName:    taskModel.Name,
 		DisplayName: taskModel.DisplayName,
 		CreateTime:  time.Now(),
@@ -67,7 +67,6 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 	}
 
 	tasks := make([]*Task, 0)
-	actors = GetTaskActors(taskModel, execution)
 
 	if taskModel.PerformType == PT_ANY {
 		SaveTask(task, actors...)
@@ -244,7 +243,7 @@ func AssignTask(taskId string, actors ...string) {
 
 //是否被授权执行任务
 func IsAllowed(task *Task, operator string) bool {
-	if operator == string(ER_ADMIN) || operator == string(ER_AUTO) || task.Operator == operator {
+	if operator == string(ER_ADMIN) || operator == string(ER_AUTO) || (task.Operator != "" && task.Operator == operator) {
 		return true
 	} else {
 		taskActors, _ := task.GetTaskActors()
@@ -254,8 +253,9 @@ func IsAllowed(task *Task, operator string) bool {
 
 //完成任务
 func CompleteTask(taskId string, operator string, args map[string]interface{}) *Task {
-	task := new(Task)
+	task := &Task{}
 	task.GetTaskById(taskId)
+	task.Variable = MapToJson(args)
 	if IsAllowed(task, operator) {
 		historyTask := &HistoryTask{
 			Id:           task.Id,
@@ -326,7 +326,7 @@ func GenerateNo() string {
 
 //保存Order
 func SaveOrder(order *Order) {
-	historyOrder := new(HistoryOrder)
+	historyOrder := &HistoryOrder{}
 	historyOrder.DataByOrder(order)
 
 	historyOrder.OrderState = FS_ACTIVITY
@@ -336,10 +336,10 @@ func SaveOrder(order *Order) {
 
 //完成Order
 func CompleteOrder(id string) {
-	order := new(Order)
+	order := &Order{}
 	order.GetOrderById(id)
 
-	historyOrder := new(HistoryOrder)
+	historyOrder := &HistoryOrder{}
 	historyOrder.GetHistoryOrderById(id)
 	historyOrder.OrderState = FS_FINISH
 
@@ -349,7 +349,7 @@ func CompleteOrder(id string) {
 
 //唤醒Order
 func ResumeOrder(id string) {
-	historyOrder := new(HistoryOrder)
+	historyOrder := &HistoryOrder{}
 	historyOrder.GetHistoryOrderById(id)
 	historyOrder.OrderState = FS_ACTIVITY
 	order := historyOrder.Undo()
@@ -375,4 +375,14 @@ func TerminateOrder(id string, operator string) {
 
 	Update(historyOrder, historyOrder.Id)
 	Delete(order, order.Id)
+}
+
+func GetSurrogate(operator string, processName string) string {
+	var result []string
+	now := time.Now()
+	surrogates, _ := GetSurrogateSQL("State = ? and StartTime =< ?  and EndTime >= ? and Operator in (?) and ProcessName in (?)", SS_ENABLE, now, now, operator, processName)
+	for _, surrogate := range surrogates {
+		result = append(result, surrogate.Surrogate)
+	}
+	return strings.Join(result, ",")
 }

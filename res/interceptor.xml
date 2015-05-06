@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process displayName="测试局部拦截器" name="interceptor">
+    <start displayName="start1" name="start1">
+        <transition name="transition1" to="task1"/>
+    </start>
+    <end displayName="end1" name="end1"/>
+    <task displayName="task1" name="task1" performType="ANY"
+          postInterceptors="test.task.interceptor.LocalTaskInterceptor"
+          preInterceptors="test.task.interceptor.LocalTaskInterceptor">
+        <transition name="transition2" to="end1"/>
+    </task>
+</process>

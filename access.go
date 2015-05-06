@@ -14,7 +14,15 @@ import (
 var orm *xorm.Engine
 
 //初始化数据库ORM引擎
-func InitAccess() {
+func InitAccessByXorm(orm *xorm.Engine) {
+	//orm.DumpAllToFile("./db_struct.sql")
+	orm.Sync2(new(HistoryOrder), new(HistoryTask), new(HistoryTaskActor),
+		new(Order), new(Process), new(Surrogate), new(Task), new(TaskActor))
+}
+
+//初始化数据库ORM引擎
+func InitAccessByConfig(cfg string) {
+	InitConfig(cfg)
 	if orm == nil {
 		log.Info(DbDriverConnstr)
 		connString := fmt.Sprintf(DbDriverConnstr, DbUsername, DbPassword,
@@ -37,9 +45,7 @@ func InitAccess() {
 		orm.SetTableMapper(tbMapper)
 		orm.SetColumnMapper(core.SameMapper{})
 
-		//orm.DumpAllToFile("./db_struct.sql")
-		orm.Sync2(new(HistoryOrder), new(HistoryTask), new(HistoryTaskActor),
-			new(Order), new(Process), new(Surrogate), new(Task), new(TaskActor))
+		InitAccessByXorm(orm)
 	}
 }
 

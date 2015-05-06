@@ -9,14 +9,46 @@ import (
 
 //流程服务
 type ProcessService struct {
-	ProcessCache map[string]*Process
-	NameCache    map[string]string
+	ProcessCache           map[string]*Process     //Process缓存，KEY为[名称.版本]
+	NameCache              map[string]string       //ProcessName缓存，KEY为ID
+	InnerInterceptorCache  map[string]IInterceptor //内置拦截器
+	CustomInterceptorCache map[string]IInterceptor //自定义拦截器
 }
 
-//初始化服务对象
+//初始化服务对象和加入内置拦截器
 func (p *ProcessService) InitProcessService() {
 	p.ProcessCache = make(map[string]*Process)
 	p.NameCache = make(map[string]string)
+	p.InnerInterceptorCache = make(map[string]IInterceptor)
+	p.CustomInterceptorCache = make(map[string]IInterceptor)
+
+	p.SetInnerInterceptor(&SurrogateInterceptor{})
+}
+
+//使用自定义拦截器缓存
+func (p *ProcessService) SetCustomInterceptor(interceptor IInterceptor) {
+	p.CustomInterceptorCache[interceptor.GetName()] = interceptor
+}
+
+//获取自定义缓存拦截器
+func (p *ProcessService) GetCustomInterceptor(name string) IInterceptor {
+	if interceptor, ok := p.CustomInterceptorCache[name]; ok {
+		return interceptor
+	}
+	return nil
+}
+
+//使用拦截器缓存
+func (p *ProcessService) SetInnerInterceptor(interceptor IInterceptor) {
+	p.InnerInterceptorCache[interceptor.GetName()] = interceptor
+}
+
+//获取缓存拦截器
+func (p *ProcessService) GetInnerInterceptor(name string) IInterceptor {
+	if interceptor, ok := p.InnerInterceptorCache[name]; ok {
+		return interceptor
+	}
+	return nil
 }
 
 //缓存Process
@@ -27,7 +59,7 @@ func (p *ProcessService) Cache(process *Process) {
 
 	if process.Model == nil {
 		processModel := &ProcessModel{}
-		processModel.BuildRelationship([]byte(process.Content))
+		processModel.BuildRelationship([]byte(process.Content), p)
 		process.SetModel(processModel)
 	}
 
@@ -40,7 +72,7 @@ func (p *ProcessService) Cache(process *Process) {
 func (p *ProcessService) Deploy(input []byte, creator string) string {
 
 	processModel := &ProcessModel{}
-	processModel.BuildRelationship(input)
+	processModel.BuildRelationship(input, p)
 
 	ver := -1
 	oldProcess, _ := GetLatestProcess(processModel.Name)
@@ -65,7 +97,7 @@ func (p *ProcessService) Deploy(input []byte, creator string) string {
 
 //重新部署Process
 func (p *ProcessService) ReDeploy(id string, input []byte) {
-	process := new(Process)
+	process := &Process{}
 	success, err := process.GetProcessById(id)
 	if err != nil {
 		log.Errorf("error to get process by id %v", err)
@@ -83,7 +115,7 @@ func (p *ProcessService) ReDeploy(id string, input []byte) {
 
 //卸载部署
 func (p *ProcessService) UnDeploy(id string) {
-	process := new(Process)
+	process := &Process{}
 	success, err := process.GetProcessById(id)
 	if err != nil {
 		log.Errorf("error to get process by id %v", err)

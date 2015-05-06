@@ -15,3 +15,10 @@ type Surrogate struct {
 	EndTime     time.Time        `xorm:"datetime"`                  //结束时间
 	State       SURROGATE_STATUS `xorm:"tinyint"`                   //状态
 }
+
+//得到代理人（通过SQL）
+func GetSurrogateSQL(querystring string, args ...interface{}) ([]*Surrogate, error) {
+	surrogates := make([]*Surrogate, 0)
+	err := orm.Where(querystring, args).Find(&surrogates)
+	return surrogates, err
+}

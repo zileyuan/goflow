@@ -1,10 +1,10 @@
 package goflow
 
 import (
-	"fmt"
 	"os"
 	"time"
 
+	"github.com/go-xorm/xorm"
 	"github.com/lunny/log"
 )
 
@@ -15,15 +15,13 @@ type Engine struct {
 
 //通过流程ID开始实例
 func (p *Engine) StartInstanceById(id string, operator string, args map[string]interface{}) *Order {
-	process := new(Process)
-	process.GetProcessById(id)
+	process := p.GetProcessById(id)
 	return p.StartProcess(process, operator, args)
 }
 
 //通过流程NAME开始实例
 func (p *Engine) StartInstanceByName(name string, version int, operator string, args map[string]interface{}) *Order {
 	process := p.GetProcessByVersion(name, version)
-	fmt.Printf("StartInstanceByName %v", process.Id)
 	return p.StartProcess(process, operator, args)
 }
 
@@ -62,17 +60,24 @@ func (p *Engine) ExecuteByProcess(process *Process, operator string, args map[st
 }
 
 //通过任务ID，执行任务
-func (p *Engine) ExecuteByTaskId(id string, operator string, args map[string]interface{}) *Execution {
+func (p *Engine) GetExecutionByTaskId(id string, operator string, args map[string]interface{}) *Execution {
 	task := CompleteTask(id, operator, args)
 
 	order := &Order{}
 	order.GetOrderById(task.OrderId)
 	order.LastUpdator = operator
 	order.LastUpdateTime = time.Now()
-	if task.TaskType != TT_MAJOR {
+	if task.TaskType == TT_ASSIST { //协办任务完成不产生执行对象
 		return nil
 	} else {
-		process := new(Process)
+		variable := JsonToMap(order.Variable)
+		for k, v := range variable {
+			if _, ok := args[k]; !ok { //判断 key 是否存在
+				args[k] = v
+			}
+		}
+
+		process := &Process{}
 		process.GetProcessById(order.ProcessId)
 
 		execution := &Execution{
@@ -81,14 +86,30 @@ func (p *Engine) ExecuteByTaskId(id string, operator string, args map[string]int
 			Order:    order,
 			Operator: operator,
 			Task:     task,
+			Args:     args,
 		}
 		return execution
 	}
 }
 
 //执行并且跳到某个任务
+func (p *Engine) ExecuteTask(id string, operator string, args map[string]interface{}) []*Task {
+	execution := p.GetExecutionByTaskId(id, operator, args)
+	if execution == nil {
+		return nil
+	}
+	processModel := execution.Process.Model
+	if processModel != nil {
+		nodeModel := processModel.GetNode(execution.Task.TaskName)
+		//将执行对象交给该任务对应的节点模型执行
+		nodeModel.Execute(execution)
+	}
+	return execution.Tasks
+}
+
+//执行并且跳到某个任务
 func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]interface{}, nodeName string) []*Task {
-	execution := p.ExecuteByTaskId(id, operator, args)
+	execution := p.GetExecutionByTaskId(id, operator, args)
 	if execution != nil {
 		model := execution.Process.Model
 		if nodeName == "" {
@@ -108,7 +129,16 @@ func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]
 }
 
 //新建引擎
-func NewEngine() *Engine {
+func NewEngineByConfig(cfg string) *Engine {
+	InitAccessByConfig(cfg)
+	engine := &Engine{}
+	engine.InitProcessService()
+	return engine
+}
+
+//新建引擎
+func NewEngineByXorm(orm *xorm.Engine) *Engine {
+	InitAccessByXorm(orm)
 	engine := &Engine{}
 	engine.InitProcessService()
 	return engine
@@ -118,6 +148,4 @@ func NewEngine() *Engine {
 func init() {
 	f, _ := os.Create("goflow.log")
 	log.Std.SetOutput(f)
-
-	InitAccess()
 }

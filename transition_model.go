@@ -1,7 +1,5 @@
 package goflow
 
-import "fmt"
-
 //XML变迁节点元素
 type TransitionModel struct {
 	BaseModel
@@ -13,21 +11,17 @@ type TransitionModel struct {
 }
 
 //执行
-func (p *TransitionModel) Execute(execution *Execution) error {
+func (p *TransitionModel) Execute(execution *Execution) {
 	if p.Enabled {
 		switch p.Target.(type) {
 		case *TaskModel:
 			taskModel := p.Target.(*TaskModel)
 			CreateTaskHandle(taskModel, execution)
-			return nil
 		case *SubProcessModel:
 			subProcessModel := p.Target.(*SubProcessModel)
 			StartSubProcessHandle(subProcessModel, execution)
-			return nil
 		default:
-			return p.Target.Execute(execution)
+			p.Target.Execute(execution)
 		}
-	} else {
-		return fmt.Errorf("Transition DisEnable!")
 	}
 }
