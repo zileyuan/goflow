@@ -50,7 +50,7 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 		CreateTime:  time.Now(),
 		TaskType:    taskModel.TaskType,
 		Model:       taskModel,
-		ExpireTime:  taskModel.ExpireTime,
+		ExpireTime:  ProcessTime(args, taskModel.ExpireTime),
 		Variable:    MapToJson(args),
 	}
 	if execution.Task == nil {
@@ -312,7 +312,7 @@ func CreateOrder(process *Process, operator string, args map[string]interface{},
 	}
 	model := process.Model
 	if model != nil {
-		order.ExpireTime = model.ExpireTime
+		order.ExpireTime = ProcessTime(args, model.ExpireTime)
 	}
 	SaveOrder(order)
 	return order
@@ -321,7 +321,7 @@ func CreateOrder(process *Process, operator string, args map[string]interface{},
 //生成OrderNo
 func GenerateNo() string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return fmt.Sprintf("%s_%04d", FormatTime(time.Now(), TIME_LAYOUT), r.Intn(1000))
+	return fmt.Sprintf("%s_%04d", FormatTime(time.Now(), ORDERNO_TIME_LAYOUT), r.Intn(1000))
 }
 
 //保存Order

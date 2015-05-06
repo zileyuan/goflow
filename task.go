@@ -18,6 +18,7 @@ type Task struct {
 	CreateTime   time.Time    `xorm:"datetime"`                   //任务创建时间
 	FinishTime   time.Time    `xorm:"datetime"`                   //任务完成时间
 	ExpireTime   time.Time    `xorm:"datetime"`                   //期望任务完成时间
+	RemindTime   time.Time    `xorm:"datetime"`                   //提醒时间
 	Action       string       `xorm:"varchar(200)"`               //任务关联的Action(WEB为表单URL)
 	ParentTaskId string       `xorm:"varchar(36) index"`          //父任务ID
 	Variable     string       `xorm:"varchar(2000)"`              //任务附属变量(json存储)

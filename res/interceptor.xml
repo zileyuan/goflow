@@ -4,9 +4,9 @@
         <transition name="transition1" to="task1"/>
     </start>
     <end displayName="end1" name="end1"/>
-    <task displayName="task1" name="task1" performType="ANY"
-          postInterceptors="test.task.interceptor.LocalTaskInterceptor"
-          preInterceptors="test.task.interceptor.LocalTaskInterceptor">
+    <task displayName="task1" name="task1" performType="ANY" taskType="MAJOR"
+          postInterceptors="Interceptor1,Interceptor2"
+          prevInterceptors="Interceptor3,Interceptor4">
         <transition name="transition2" to="end1"/>
     </task>
 </process>

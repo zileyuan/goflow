@@ -5,7 +5,7 @@
     </start>
     <end displayName="end1" name="end1"/>
     <task assignee="task1.operator" autoExecute="true" callback="test.time.expire.TestCallback" displayName="task1"
-          expireTime="task1.expireTime" name="task1" performType="ANY" reminderRepeat="1" reminderTime="task1.reminderTime">
+          expireTime="task1.expireTime" name="task1" performType="ANY" taskType="MAJOR">
         <transition name="transition2" to="end1"/>
     </task>  
 </process>

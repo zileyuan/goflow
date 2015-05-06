@@ -7,7 +7,7 @@ type NodeModel struct {
 	BaseModel
 	Inputs                  []*TransitionModel `xml:"-"`                     //输入变迁集合
 	Outputs                 []*TransitionModel `xml:"transition"`            //输出变迁集合
-	PrevInterceptorsSetting string             `xml:"postInterceptors,attr"` //局部前置拦截器
+	PrevInterceptorsSetting string             `xml:"prevInterceptors,attr"` //局部前置拦截器
 	PostInterceptorsSetting string             `xml:"postInterceptors,attr"` //局部后置拦截器
 	PrevInterceptors        []IInterceptor     `xml:"-"`                     //局部前置拦截器对象
 	PostInterceptors        []IInterceptor     `xml:"-"`                     //局部后置拦截器对象

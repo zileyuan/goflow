@@ -75,3 +75,19 @@ func FormatTime(t time.Time, layout string) string {
 		return t.Format(layout)
 	}
 }
+
+func ProcessTime(args map[string]interface{}, timeParam string) time.Time {
+	if timeParam != "" {
+		var timeStr string
+		if timeInf, ok := args[timeParam]; ok {
+			timeStr = timeInf.(string)
+		} else {
+			timeStr = timeParam
+		}
+		the_time, err := time.Parse(STD_TIME_LAYOUT, timeStr)
+		if err == nil {
+			return the_time
+		}
+	}
+	return time.Time{}
+}

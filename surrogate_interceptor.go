@@ -23,5 +23,5 @@ func (p *SurrogateInterceptor) Intercept(execution *Execution) {
 }
 
 func (p *SurrogateInterceptor) Clone() IInterceptor {
-	return &SurrogateInterceptor{}
+	return p
 }

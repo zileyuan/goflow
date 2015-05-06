@@ -3,7 +3,6 @@ package goflow
 import (
 	"encoding/xml"
 	"fmt"
-	"time"
 
 	"github.com/lunny/log"
 )
@@ -19,7 +18,7 @@ type ProcessModel struct {
 	JoinModels       []*JoinModel       `xml:"join"`                //合并节点
 	SubProcessModels []*SubProcessModel `xml:"subprocess"`          //子流程节点
 	InstanceAction   string             `xml:"instanceAction,attr"` //流程实例启动Action(web为url)
-	ExpireTime       time.Time          `xml:"expireTime,attr"`     //期望完成时间
+	ExpireTime       string             `xml:"expireTime,attr"`     //期望完成时间
 	Models           []INodeModel       `xml:"-"`                   //上面所有Node节点(Start\End\Task\Decision\Fork\Join\SubProcess)的集合
 }
 
