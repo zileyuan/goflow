@@ -377,6 +377,7 @@ func TerminateOrder(id string, operator string) {
 	Delete(order, order.Id)
 }
 
+//得到代理人
 func GetSurrogate(operator string, processName string) string {
 	var result []string
 	now := time.Now()
@@ -385,4 +386,37 @@ func GetSurrogate(operator string, processName string) string {
 		result = append(result, surrogate.Surrogate)
 	}
 	return strings.Join(result, ",")
+}
+
+//创建抄送
+func CreateCCOrder(orderId string, creator string, actorIds ...string) {
+	for _, actorId := range actorIds {
+		ccorder := &CCOrder{
+			Id:         NewUUID(),
+			OrderId:    orderId,
+			ActorId:    actorId,
+			Creator:    creator,
+			State:      FS_ACTIVITY,
+			CreateTime: time.Now(),
+		}
+		Save(ccorder, ccorder.Id)
+	}
+}
+
+//更新抄送记录状态为已阅
+func UpdateCCStatus(orderId string, actorIds ...string) {
+	ccorders, _ := GetCCOrder(orderId, actorIds...)
+	for _, ccorder := range ccorders {
+		ccorder.State = FS_FINISH
+		ccorder.FinishTime = time.Now()
+		Update(ccorder, ccorder.Id)
+	}
+}
+
+//删除指定的抄送记录
+func DeleteCCOrder(orderId string, actorId string) {
+	ccorders, _ := GetCCOrder(orderId, actorId)
+	for _, ccorder := range ccorders {
+		Delete(ccorder, ccorder.Id)
+	}
 }
