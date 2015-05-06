@@ -48,7 +48,7 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 		TaskName:    taskModel.Name,
 		DisplayName: taskModel.DisplayName,
 		CreateTime:  time.Now(),
-		TaskType:    taskModel.TaskType,
+		TaskType:    ProcessTaskType(taskModel.TaskType),
 		Model:       taskModel,
 		ExpireTime:  ProcessTime(args, taskModel.ExpireTime),
 		Variable:    MapToJson(args),
@@ -68,7 +68,7 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 
 	tasks := make([]*Task, 0)
 
-	if taskModel.PerformType == PT_ANY {
+	if ProcessPerformType(taskModel.PerformType) == PO_ANY {
 		SaveTask(task, actors...)
 		tasks = append(tasks, task)
 	} else {
@@ -85,13 +85,13 @@ func CreateTask(taskModel *TaskModel, execution *Execution) []*Task {
 //保存任务
 func SaveTask(task *Task, actors ...string) {
 	task.Id = NewUUID()
-	task.PerformType = PT_ANY
+	task.PerformType = PO_ANY
 	Save(task, task.Id)
 	AssignTask(task.Id, actors...)
 }
 
 //根据已有任务、任务类型、参与者创建新的任务，适用于转派，动态协办处理
-func CreateNewTask(taskId string, taskType TASK_TYPE, actors ...string) {
+func CreateNewTask(taskId string, taskType TASK_ORDER, actors ...string) {
 	task := &Task{}
 	task.GetTaskById(taskId)
 	newTask := *task
@@ -128,7 +128,7 @@ func WithdrawTask(taskId string, operator string) *Task {
 	historyTask := &HistoryTask{}
 	historyTask.GetHistoryTaskById(taskId)
 	var tasks []*Task
-	if historyTask.PerformType == PT_ANY {
+	if historyTask.PerformType == PO_ANY {
 		tasks, _ = GetNextAnyActiveTasks(historyTask.Id)
 	} else {
 		tasks, _ = GetNextAllActiveTasks(historyTask.OrderId, historyTask.TaskName, historyTask.ParentTaskId)
@@ -146,10 +146,10 @@ func WithdrawTask(taskId string, operator string) *Task {
 }
 
 //加任务角色
-func AddTaskActor(taskId string, performType PERFORM_TYPE, actors ...string) {
+func AddTaskActor(taskId string, performType PERFORM_ORDER, actors ...string) {
 	task := &Task{}
 	task.GetTaskById(taskId)
-	if performType == PT_ANY {
+	if performType == PO_ANY {
 		AssignTask(taskId, actors...)
 		v := JsonToMap(task.Variable)
 		oldActor := v[DEFAULT_KEY_ACTOR].(string)
@@ -176,7 +176,7 @@ func AddTaskActor(taskId string, performType PERFORM_TYPE, actors ...string) {
 func RemoveTaskActor(taskId string, actors ...string) {
 	task := &Task{}
 	task.GetTaskById(taskId)
-	if len(actors) > 0 && task.TaskType == TT_MAJOR {
+	if len(actors) > 0 && task.TaskType == TO_MAJOR {
 		for _, actorId := range actors {
 			taskActor := &TaskActor{
 				TaskId:  taskId,
@@ -188,7 +188,7 @@ func RemoveTaskActor(taskId string, actors ...string) {
 		oldActors := strings.Split(v[DEFAULT_KEY_ACTOR].(string), ",")
 		for _, actor := range actors {
 			for k, s := range oldActors {
-				if s == actor {
+				if strings.ToUpper(s) == strings.ToUpper(actor) {
 					oldActors = StringsRemoveAtIndex(oldActors, k)
 					break
 				}
@@ -243,7 +243,9 @@ func AssignTask(taskId string, actors ...string) {
 
 //是否被授权执行任务
 func IsAllowed(task *Task, operator string) bool {
-	if operator == string(ER_ADMIN) || operator == string(ER_AUTO) || (task.Operator != "" && task.Operator == operator) {
+	if strings.ToUpper(operator) == string(ER_ADMIN) ||
+		strings.ToUpper(operator) == string(ER_AUTO) ||
+		(task.Operator != "" && strings.ToUpper(task.Operator) == strings.ToUpper(operator)) {
 		return true
 	} else {
 		taskActors, _ := task.GetTaskActors()

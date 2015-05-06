@@ -134,7 +134,7 @@ func TestAssist(t *testing.T) {
 	order := engine.StartInstanceByName("assist", -1, "2", args)
 	tasks := GetActiveTasksByOrderId(order.Id)
 	for _, task := range tasks {
-		CreateNewTask(task.Id, TT_ASSIST, "test")
+		CreateNewTask(task.Id, TO_ASSIST, "test")
 	}
 	fmt.Printf("--- End TestAssist ---\n")
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bitly/go-simplejson"
@@ -90,4 +91,20 @@ func ProcessTime(args map[string]interface{}, timeParam string) time.Time {
 		}
 	}
 	return time.Time{}
+}
+
+func ProcessTaskType(taskType TASK_TYPE) TASK_ORDER {
+	if strings.ToUpper(string(taskType)) == string(TT_ASSIST) {
+		return TO_ASSIST
+	} else {
+		return TO_MAJOR
+	}
+}
+
+func ProcessPerformType(performType PERFORM_TYPE) PERFORM_ORDER {
+	if strings.ToUpper(string(performType)) == string(PT_ALL) {
+		return PO_ALL
+	} else {
+		return PO_ANY
+	}
 }

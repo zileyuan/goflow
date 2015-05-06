@@ -67,7 +67,7 @@ func (p *Engine) GetExecutionByTaskId(id string, operator string, args map[strin
 	order.GetOrderById(task.OrderId)
 	order.LastUpdator = operator
 	order.LastUpdateTime = time.Now()
-	if task.TaskType == TT_ASSIST { //协办任务完成不产生执行对象
+	if task.TaskType == TO_ASSIST { //协办任务完成不产生执行对象
 		return nil
 	} else {
 		variable := JsonToMap(order.Variable)

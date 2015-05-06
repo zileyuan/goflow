@@ -99,7 +99,7 @@ func MergeHandle(execution *Execution, activeNodes []string) {
 func CanRejected(currentNode INodeModel, parentNode INodeModel) bool {
 	switch parentNode.(type) {
 	case *TaskModel:
-		if parentNode.(*TaskModel).PerformType == PT_ANY {
+		if ProcessPerformType(parentNode.(*TaskModel).PerformType) == PO_ANY {
 			return false
 		}
 	default:

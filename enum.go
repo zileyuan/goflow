@@ -3,7 +3,7 @@ package goflow
 //特性的关键字
 const (
 	DEFAULT_SEPARATOR   = "."                                    //默认分割符
-	DEFAULT_KEY_ACTOR   = "SPECIFY_ACTOR"                        //指定的actor
+	DEFAULT_KEY_ACTOR   = "S_ACTOR"                              //指定的actor
 	DEFAULT_START_ID    = "00000000-0000-0000-0000-000000000000" //start node
 	ORDERNO_TIME_LAYOUT = "2006-01-02_15:04:05.000"              //OrderNo时间格式
 	STD_TIME_LAYOUT     = "2006-01-02 15:04:05"                  //标准时间格式
@@ -28,11 +28,27 @@ const (
 )
 
 //任务类型
+type TASK_ORDER int
+
+const (
+	TO_MAJOR  TASK_ORDER = iota //主办任务
+	TO_ASSIST                   //协办任务
+)
+
+//任务类型
 type TASK_TYPE string
 
 const (
 	TT_MAJOR  TASK_TYPE = "MAJOR"  //主办任务
 	TT_ASSIST TASK_TYPE = "ASSIST" //协办任务
+)
+
+//任务参与方式
+type PERFORM_ORDER int
+
+const (
+	PO_ANY PERFORM_ORDER = iota //普通任务，即：任何一个参与者处理完即执行下一步
+	PO_ALL                      //会签任务，即：所有参与者都完成，才可执行下一步
 )
 
 //任务参与方式

@@ -3,6 +3,7 @@ package goflow
 import (
 	"encoding/xml"
 	"fmt"
+	"strings"
 
 	"github.com/lunny/log"
 )
@@ -79,7 +80,7 @@ func (p *ProcessModel) GetStart() *StartModel {
 func (p *ProcessModel) ContainsSubProcessNodeNames(nodeNames ...string) bool {
 	for _, node := range p.SubProcessModels {
 		for _, nodeName := range nodeNames {
-			if node.Name == nodeName {
+			if strings.ToUpper(node.Name) == strings.ToUpper(nodeName) {
 				return true
 			}
 		}
@@ -91,7 +92,7 @@ func (p *ProcessModel) ContainsSubProcessNodeNames(nodeNames ...string) bool {
 func (p *ProcessModel) ContainsTaskNodeNames(nodeNames ...string) bool {
 	for _, node := range p.TaskModels {
 		for _, nodeName := range nodeNames {
-			if node.Name == nodeName {
+			if strings.ToUpper(node.Name) == strings.ToUpper(nodeName) {
 				return true
 			}
 		}
@@ -102,7 +103,7 @@ func (p *ProcessModel) ContainsTaskNodeNames(nodeNames ...string) bool {
 //根据名称得到节点
 func (p *ProcessModel) GetNode(name string) INodeModel {
 	for _, v := range p.Models {
-		if v.GetName() == name {
+		if strings.ToUpper(v.GetName()) == strings.ToUpper(name) {
 			return v
 		}
 	}

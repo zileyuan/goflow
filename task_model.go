@@ -11,7 +11,7 @@ type TaskModel struct {
 }
 
 func (p *TaskModel) Exec(execution *Execution) {
-	if p.PerformType == PT_ANY {
+	if ProcessPerformType(p.PerformType) == PO_ANY {
 		p.RunOutTransition(execution)
 	} else {
 		MergeActorHandle(p, execution)
