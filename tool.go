@@ -93,6 +93,7 @@ func ProcessTime(args map[string]interface{}, timeParam string) time.Time {
 	return time.Time{}
 }
 
+//TaskType转换
 func ProcessTaskType(taskType TASK_TYPE) TASK_ORDER {
 	if strings.ToUpper(string(taskType)) == string(TT_ASSIST) {
 		return TO_ASSIST
@@ -101,10 +102,19 @@ func ProcessTaskType(taskType TASK_TYPE) TASK_ORDER {
 	}
 }
 
+//PerformType转换
 func ProcessPerformType(performType PERFORM_TYPE) PERFORM_ORDER {
 	if strings.ToUpper(string(performType)) == string(PT_ALL) {
 		return PO_ALL
 	} else {
 		return PO_ANY
+	}
+}
+
+//error处理
+func PanicIf(err error, format string, v ...interface{}) {
+	if err != nil {
+		log.Errorf(format+" [ %v ]", v, err)
+		panic(err)
 	}
 }

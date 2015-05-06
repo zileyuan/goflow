@@ -20,15 +20,17 @@ type Order struct {
 }
 
 //根据ID得到Order
-func (p *Order) GetOrderById(id string) (bool, error) {
+func (p *Order) GetOrderById(id string) bool {
 	p.Id = id
 	success, err := orm.Get(p)
-	return success, err
+	PanicIf(err, "fail to GetOrderById")
+	return success
 }
 
 //得到活动的Order（通过SQL）
-func GetActiveOrdersSQL(querystring string, args ...interface{}) ([]*Order, error) {
+func GetActiveOrdersSQL(querystring string, args ...interface{}) []*Order {
 	orders := make([]*Order, 0)
 	err := orm.Where(querystring, args).Find(&orders)
-	return orders, err
+	PanicIf(err, "fail to GetActiveOrdersSQL")
+	return orders
 }

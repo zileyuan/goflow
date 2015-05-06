@@ -5,14 +5,12 @@ import (
 	"math/rand"
 	"strings"
 	"time"
-
-	"github.com/lunny/log"
 )
 
 //根据OrderID得到活动流程
 func GetActiveTasksByOrderId(orderId string) []*Task {
 	task := &Task{}
-	tasks, _ := task.GetActiveTasksByOrderId(orderId)
+	tasks := task.GetActiveTasksByOrderId(orderId)
 	return tasks
 }
 
@@ -93,13 +91,14 @@ func SaveTask(task *Task, actors ...string) {
 //根据已有任务、任务类型、参与者创建新的任务，适用于转派，动态协办处理
 func CreateNewTask(taskId string, taskType TASK_ORDER, actors ...string) {
 	task := &Task{}
-	task.GetTaskById(taskId)
-	newTask := *task
-	pNewTask := &newTask
-	pNewTask.TaskType = taskType
-	pNewTask.CreateTime = time.Now()
-	pNewTask.ParentTaskId = taskId
-	SaveTask(pNewTask, actors...)
+	if task.GetTaskById(taskId) {
+		newTask := *task
+		pNewTask := &newTask
+		pNewTask.TaskType = taskType
+		pNewTask.CreateTime = time.Now()
+		pNewTask.ParentTaskId = taskId
+		SaveTask(pNewTask, actors...)
+	}
 }
 
 //驳回任务
@@ -110,15 +109,16 @@ func RejectTask(processModel *ProcessModel, currTask *Task) *Task {
 	}
 	currentNode := processModel.GetNode(currTask.TaskName)
 	historyTask := &HistoryTask{}
-	historyTask.GetHistoryTaskById(parentTaskId)
-	parentNode := processModel.GetNode(historyTask.TaskName)
-	if CanRejected(currentNode, parentNode) {
-		task := historyTask.Undo()
-		task.Id = NewUUID()
-		task.CreateTime = time.Now()
-		Save(task, task.Id)
-		AssignTask(task.Id, task.Operator)
-		return task
+	if historyTask.GetHistoryTaskById(parentTaskId) {
+		parentNode := processModel.GetNode(historyTask.TaskName)
+		if CanRejected(currentNode, parentNode) {
+			task := historyTask.Undo()
+			task.Id = NewUUID()
+			task.CreateTime = time.Now()
+			Save(task, task.Id)
+			AssignTask(task.Id, task.Operator)
+			return task
+		}
 	}
 	return nil
 }
@@ -126,48 +126,52 @@ func RejectTask(processModel *ProcessModel, currTask *Task) *Task {
 //撤销任务
 func WithdrawTask(taskId string, operator string) *Task {
 	historyTask := &HistoryTask{}
-	historyTask.GetHistoryTaskById(taskId)
-	var tasks []*Task
-	if historyTask.PerformType == PO_ANY {
-		tasks, _ = GetNextAnyActiveTasks(historyTask.Id)
-	} else {
-		tasks, _ = GetNextAllActiveTasks(historyTask.OrderId, historyTask.TaskName, historyTask.ParentTaskId)
-	}
-	for _, task := range tasks {
-		Delete(task, task.Id)
-	}
+	if historyTask.GetHistoryTaskById(taskId) {
+		var tasks []*Task
+		if historyTask.PerformType == PO_ANY {
+			tasks = GetNextAnyActiveTasks(historyTask.Id)
+		} else {
+			tasks = GetNextAllActiveTasks(historyTask.OrderId, historyTask.TaskName, historyTask.ParentTaskId)
+		}
+		for _, task := range tasks {
+			Delete(task, task.Id)
+		}
 
-	task := historyTask.Undo()
-	task.Id = NewUUID()
-	task.CreateTime = time.Now()
-	Save(task, task.Id)
-	AssignTask(task.Id, task.Operator)
-	return task
+		task := historyTask.Undo()
+		task.Id = NewUUID()
+		task.CreateTime = time.Now()
+		Save(task, task.Id)
+		AssignTask(task.Id, task.Operator)
+		return task
+	} else {
+		return nil
+	}
 }
 
 //加任务角色
 func AddTaskActor(taskId string, performType PERFORM_ORDER, actors ...string) {
 	task := &Task{}
-	task.GetTaskById(taskId)
-	if performType == PO_ANY {
-		AssignTask(taskId, actors...)
-		v := JsonToMap(task.Variable)
-		oldActor := v[DEFAULT_KEY_ACTOR].(string)
-		v[DEFAULT_KEY_ACTOR] = oldActor + "," + strings.Join(actors, ",")
-		task.Variable = MapToJson(v)
-		Update(task, task.Id)
-	} else {
-		for _, actor := range actors {
-			newTask := *task
-			pNewTask := &newTask
-			pNewTask.Id = NewUUID()
-			pNewTask.CreateTime = time.Now()
-			pNewTask.Operator = actor
+	if task.GetTaskById(taskId) {
+		if performType == PO_ANY {
+			AssignTask(taskId, actors...)
 			v := JsonToMap(task.Variable)
-			v[DEFAULT_KEY_ACTOR] = actor
+			oldActor := v[DEFAULT_KEY_ACTOR].(string)
+			v[DEFAULT_KEY_ACTOR] = oldActor + "," + strings.Join(actors, ",")
 			task.Variable = MapToJson(v)
-			Save(pNewTask, pNewTask.Id)
-			AssignTask(pNewTask.Id, actor)
+			Update(task, task.Id)
+		} else {
+			for _, actor := range actors {
+				newTask := *task
+				pNewTask := &newTask
+				pNewTask.Id = NewUUID()
+				pNewTask.CreateTime = time.Now()
+				pNewTask.Operator = actor
+				v := JsonToMap(task.Variable)
+				v[DEFAULT_KEY_ACTOR] = actor
+				task.Variable = MapToJson(v)
+				Save(pNewTask, pNewTask.Id)
+				AssignTask(pNewTask.Id, actor)
+			}
 		}
 	}
 }
@@ -175,39 +179,36 @@ func AddTaskActor(taskId string, performType PERFORM_ORDER, actors ...string) {
 //删除任务角色
 func RemoveTaskActor(taskId string, actors ...string) {
 	task := &Task{}
-	task.GetTaskById(taskId)
-	if len(actors) > 0 && task.TaskType == TO_MAJOR {
-		for _, actorId := range actors {
-			taskActor := &TaskActor{
-				TaskId:  taskId,
-				ActorId: actorId,
+	if task.GetTaskById(taskId) {
+		if len(actors) > 0 && task.TaskType == TO_MAJOR {
+			for _, actorId := range actors {
+				taskActor := &TaskActor{
+					TaskId:  taskId,
+					ActorId: actorId,
+				}
+				DeleteObj(taskActor)
 			}
-			DeleteObj(taskActor)
-		}
-		v := JsonToMap(task.Variable)
-		oldActors := strings.Split(v[DEFAULT_KEY_ACTOR].(string), ",")
-		for _, actor := range actors {
-			for k, s := range oldActors {
-				if strings.ToUpper(s) == strings.ToUpper(actor) {
-					oldActors = StringsRemoveAtIndex(oldActors, k)
-					break
+			v := JsonToMap(task.Variable)
+			oldActors := strings.Split(v[DEFAULT_KEY_ACTOR].(string), ",")
+			for _, actor := range actors {
+				for k, s := range oldActors {
+					if strings.ToUpper(s) == strings.ToUpper(actor) {
+						oldActors = StringsRemoveAtIndex(oldActors, k)
+						break
+					}
 				}
 			}
+			v[DEFAULT_KEY_ACTOR] = oldActors
+			task.Variable = MapToJson(v)
+			Update(task, task.Id)
 		}
-		v[DEFAULT_KEY_ACTOR] = oldActors
-		task.Variable = MapToJson(v)
-		Update(task, task.Id)
 	}
 }
 
 //结束并且提取任务
 func TakeTask(taskId string, operator string) *Task {
 	task := &Task{}
-	success, err := task.GetTaskById(taskId)
-	if err != nil {
-		log.Errorf("error to get task by id %v", err)
-		panic(fmt.Errorf("error to get task by id!"))
-	}
+	success := task.GetTaskById(taskId)
 
 	if success {
 		if !IsAllowed(task, operator) {
@@ -218,7 +219,6 @@ func TakeTask(taskId string, operator string) *Task {
 		Update(task, task.Id)
 		return task
 	} else {
-		log.Infof("fail to get task by id %v", err)
 		return nil
 	}
 }
@@ -248,7 +248,7 @@ func IsAllowed(task *Task, operator string) bool {
 		(task.Operator != "" && strings.ToUpper(task.Operator) == strings.ToUpper(operator)) {
 		return true
 	} else {
-		taskActors, _ := task.GetTaskActors()
+		taskActors := task.GetTaskActors()
 		return len(taskActors) == 0
 	}
 }
@@ -256,40 +256,42 @@ func IsAllowed(task *Task, operator string) bool {
 //完成任务
 func CompleteTask(taskId string, operator string, args map[string]interface{}) *Task {
 	task := &Task{}
-	task.GetTaskById(taskId)
-	task.Variable = MapToJson(args)
-	if IsAllowed(task, operator) {
-		historyTask := &HistoryTask{
-			Id:           task.Id,
-			OrderId:      task.OrderId,
-			CreateTime:   task.CreateTime,
-			DisplayName:  task.DisplayName,
-			TaskName:     task.TaskName,
-			TaskType:     task.TaskType,
-			ExpireTime:   task.ExpireTime,
-			Action:       task.Action,
-			ParentTaskId: task.ParentTaskId,
-			Variable:     task.Variable,
-			PerformType:  task.PerformType,
-			FinishTime:   time.Now(),
-			Operator:     operator,
-			TaskState:    FS_FINISH,
-		}
-		Save(historyTask, historyTask.Id)
-		Delete(task, task.Id)
-
-		taskActors, _ := GetTaskActorsByTaskId(historyTask.Id)
-		for _, taskActor := range taskActors {
-			historyTaskActor := &HistoryTaskActor{
-				Id:      taskActor.Id,
-				TaskId:  taskActor.TaskId,
-				ActorId: taskActor.ActorId,
+	if task.GetTaskById(taskId) {
+		task.Variable = MapToJson(args)
+		if IsAllowed(task, operator) {
+			historyTask := &HistoryTask{
+				Id:           task.Id,
+				OrderId:      task.OrderId,
+				CreateTime:   task.CreateTime,
+				DisplayName:  task.DisplayName,
+				TaskName:     task.TaskName,
+				TaskType:     task.TaskType,
+				ExpireTime:   task.ExpireTime,
+				Action:       task.Action,
+				ParentTaskId: task.ParentTaskId,
+				Variable:     task.Variable,
+				PerformType:  task.PerformType,
+				FinishTime:   time.Now(),
+				Operator:     operator,
+				TaskState:    FS_FINISH,
 			}
-			Save(historyTaskActor, historyTaskActor.Id)
-			Delete(taskActor, taskActor.Id)
+			Save(historyTask, historyTask.Id)
+			Delete(task, task.Id)
+
+			taskActors := GetTaskActorsByTaskId(historyTask.Id)
+			for _, taskActor := range taskActors {
+				historyTaskActor := &HistoryTaskActor{
+					Id:      taskActor.Id,
+					TaskId:  taskActor.TaskId,
+					ActorId: taskActor.ActorId,
+				}
+				Save(historyTaskActor, historyTaskActor.Id)
+				Delete(taskActor, taskActor.Id)
+			}
 		}
+		return task
 	}
-	return task
+	return nil
 }
 
 //创建Order
@@ -339,25 +341,28 @@ func SaveOrder(order *Order) {
 //完成Order
 func CompleteOrder(id string) {
 	order := &Order{}
-	order.GetOrderById(id)
+	if order.GetOrderById(id) {
 
-	historyOrder := &HistoryOrder{}
-	historyOrder.GetHistoryOrderById(id)
-	historyOrder.OrderState = FS_FINISH
+		historyOrder := &HistoryOrder{}
+		if historyOrder.GetHistoryOrderById(id) {
+			historyOrder.OrderState = FS_FINISH
 
-	Update(historyOrder, historyOrder.Id)
-	Delete(order, order.Id)
+			Update(historyOrder, historyOrder.Id)
+			Delete(order, order.Id)
+		}
+	}
 }
 
 //唤醒Order
 func ResumeOrder(id string) {
 	historyOrder := &HistoryOrder{}
-	historyOrder.GetHistoryOrderById(id)
-	historyOrder.OrderState = FS_ACTIVITY
-	order := historyOrder.Undo()
+	if historyOrder.GetHistoryOrderById(id) {
+		historyOrder.OrderState = FS_ACTIVITY
+		order := historyOrder.Undo()
 
-	Save(order, order.Id)
-	Save(historyOrder, historyOrder.Id)
+		Save(order, order.Id)
+		Save(historyOrder, historyOrder.Id)
+	}
 
 }
 
@@ -369,21 +374,22 @@ func TerminateOrder(id string, operator string) {
 	}
 
 	order := &Order{}
-	order.GetOrderById(id)
-	historyOrder := &HistoryOrder{}
-	historyOrder.DataByOrder(order)
-	historyOrder.OrderState = FS_TERMINATION
-	historyOrder.FinishTime = time.Now()
+	if order.GetOrderById(id) {
+		historyOrder := &HistoryOrder{}
+		historyOrder.DataByOrder(order)
+		historyOrder.OrderState = FS_TERMINATION
+		historyOrder.FinishTime = time.Now()
 
-	Update(historyOrder, historyOrder.Id)
-	Delete(order, order.Id)
+		Update(historyOrder, historyOrder.Id)
+		Delete(order, order.Id)
+	}
 }
 
 //得到代理人
 func GetSurrogate(operator string, processName string) string {
 	var result []string
 	now := time.Now()
-	surrogates, _ := GetSurrogateSQL("State = ? and StartTime =< ?  and EndTime >= ? and Operator in (?) and ProcessName in (?)", SS_ENABLE, now, now, operator, processName)
+	surrogates := GetSurrogateSQL("State = ? and StartTime =< ?  and EndTime >= ? and Operator in (?) and ProcessName in (?)", SS_ENABLE, now, now, operator, processName)
 	for _, surrogate := range surrogates {
 		result = append(result, surrogate.Surrogate)
 	}
@@ -407,7 +413,7 @@ func CreateCCOrder(orderId string, creator string, actorIds ...string) {
 
 //更新抄送记录状态为已阅
 func UpdateCCStatus(orderId string, actorIds ...string) {
-	ccorders, _ := GetCCOrder(orderId, actorIds...)
+	ccorders := GetCCOrder(orderId, actorIds...)
 	for _, ccorder := range ccorders {
 		ccorder.State = FS_FINISH
 		ccorder.FinishTime = time.Now()
@@ -417,7 +423,7 @@ func UpdateCCStatus(orderId string, actorIds ...string) {
 
 //删除指定的抄送记录
 func DeleteCCOrder(orderId string, actorId string) {
-	ccorders, _ := GetCCOrder(orderId, actorId)
+	ccorders := GetCCOrder(orderId, actorId)
 	for _, ccorder := range ccorders {
 		Delete(ccorder, ccorder.Id)
 	}

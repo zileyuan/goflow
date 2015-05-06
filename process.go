@@ -17,16 +17,18 @@ type Process struct {
 }
 
 //根据ID得到Process
-func (p *Process) GetProcessById(id string) (bool, error) {
+func (p *Process) GetProcessById(id string) bool {
 	p.Id = id
 	success, err := orm.Get(p)
-	return success, err
+	PanicIf(err, "fail to GetProcessById")
+	return success
 }
 
 //根据Process本身条件得到Process
-func (p *Process) GetProcess() (bool, error) {
+func (p *Process) GetProcess() bool {
 	success, err := orm.Get(p)
-	return success, err
+	PanicIf(err, "fail to GetProcess")
+	return success
 }
 
 //设定Model对象
@@ -38,15 +40,16 @@ func (p *Process) SetModel(model *ProcessModel) {
 }
 
 //得到最新的Process
-func GetLatestProcess(name string) (*Process, error) {
+func GetLatestProcess(name string) *Process {
 	process := &Process{
 		Name: name,
 	}
 	processes := make([]*Process, 0)
 	err := orm.Desc("Version").Find(&processes, process)
+	PanicIf(err, "fail to GetLatestProcess")
 	if len(processes) > 0 {
-		return processes[0], err
+		return processes[0]
 	} else {
-		return nil, err
+		return nil
 	}
 }

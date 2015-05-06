@@ -8,11 +8,12 @@ type TaskActor struct {
 }
 
 //通过任务ID，得到任务角色
-func GetTaskActorsByTaskId(taskId string) ([]*TaskActor, error) {
+func GetTaskActorsByTaskId(taskId string) []*TaskActor {
 	taskActor := &TaskActor{
 		TaskId: taskId,
 	}
 	taskActors := make([]*TaskActor, 0)
 	err := orm.Find(&taskActors, taskActor)
-	return taskActors, err
+	PanicIf(err, "fail to GetTaskActorsByTaskId")
+	return taskActors
 }

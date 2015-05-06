@@ -64,31 +64,37 @@ func (p *Engine) GetExecutionByTaskId(id string, operator string, args map[strin
 	task := CompleteTask(id, operator, args)
 
 	order := &Order{}
-	order.GetOrderById(task.OrderId)
-	order.LastUpdator = operator
-	order.LastUpdateTime = time.Now()
-	if task.TaskType == TO_ASSIST { //协办任务完成不产生执行对象
-		return nil
-	} else {
-		variable := JsonToMap(order.Variable)
-		for k, v := range variable {
-			if _, ok := args[k]; !ok { //判断 key 是否存在
-				args[k] = v
+	if order.GetOrderById(task.OrderId) {
+		order.LastUpdator = operator
+		order.LastUpdateTime = time.Now()
+		if task.TaskType == TO_ASSIST { //协办任务完成不产生执行对象
+			return nil
+		} else {
+			variable := JsonToMap(order.Variable)
+			for k, v := range variable {
+				if _, ok := args[k]; !ok { //判断 key 是否存在
+					args[k] = v
+				}
+			}
+
+			process := &Process{}
+			if process.GetProcessById(order.ProcessId) {
+
+				execution := &Execution{
+					Engine:   p,
+					Process:  process,
+					Order:    order,
+					Operator: operator,
+					Task:     task,
+					Args:     args,
+				}
+				return execution
+			} else {
+				return nil
 			}
 		}
-
-		process := &Process{}
-		process.GetProcessById(order.ProcessId)
-
-		execution := &Execution{
-			Engine:   p,
-			Process:  process,
-			Order:    order,
-			Operator: operator,
-			Task:     task,
-			Args:     args,
-		}
-		return execution
+	} else {
+		return nil
 	}
 }
 

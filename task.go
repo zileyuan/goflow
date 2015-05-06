@@ -26,49 +26,54 @@ type Task struct {
 }
 
 //根据ID得到任务
-func (p *Task) GetTaskById(id string) (bool, error) {
+func (p *Task) GetTaskById(id string) bool {
 	p.Id = id
 	success, err := orm.Get(p)
-	return success, err
+	PanicIf(err, "fail to GetTaskById")
+	return success
 }
 
 //得到活动任务
-func (p *Task) GetActiveTasks() ([]*Task, error) {
+func (p *Task) GetActiveTasks() []*Task {
 	tasks := make([]*Task, 0)
 	err := orm.Find(&tasks, p)
-	return tasks, err
+	PanicIf(err, "fail to GetActiveTasks")
+	return tasks
 }
 
 //根据OrderID得到活动任务
-func (p *Task) GetActiveTasksByOrderId(orderId string) ([]*Task, error) {
+func (p *Task) GetActiveTasksByOrderId(orderId string) []*Task {
 	p.OrderId = orderId
 	tasks := make([]*Task, 0)
 	err := orm.Find(&tasks, p)
-	return tasks, err
+	PanicIf(err, "fail to GetActiveTasksByOrderId")
+	return tasks
 }
 
 //得到任务角色
-func (p *Task) GetTaskActors() ([]*TaskActor, error) {
+func (p *Task) GetTaskActors() []*TaskActor {
 	taskActors := make([]*TaskActor, 0)
 	taskActor := &TaskActor{
 		TaskId: p.Id,
 	}
 	err := orm.Find(&taskActors, taskActor)
-	return taskActors, err
+	PanicIf(err, "fail to GetTaskActors")
+	return taskActors
 }
 
 //得到下一个ANY类型的任务
-func GetNextAnyActiveTasks(parentTaskId string) ([]*Task, error) {
+func GetNextAnyActiveTasks(parentTaskId string) []*Task {
 	task := &Task{
 		ParentTaskId: parentTaskId,
 	}
 	tasks := make([]*Task, 0)
 	err := orm.Find(&tasks, task)
-	return tasks, err
+	PanicIf(err, "fail to GetNextAnyActiveTasks")
+	return tasks
 }
 
 //得到下一个ALL类型的任务
-func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string) ([]*Task, error) {
+func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string) []*Task {
 	historyTask := &HistoryTask{
 		OrderId:      orderId,
 		TaskName:     taskName,
@@ -76,6 +81,7 @@ func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string)
 	}
 	historyTasks := make([]*HistoryTask, 0)
 	err := orm.Find(&historyTasks, historyTask)
+	PanicIf(err, "fail to GetNextAllActiveTasks One")
 
 	ids := make([]string, 0)
 	for _, historyTask = range historyTasks {
@@ -83,8 +89,9 @@ func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string)
 	}
 	tasks := make([]*Task, 0)
 	err = orm.Where("ParentTaskId in (?)", strings.Join(ids, ",")).Find(&tasks)
+	PanicIf(err, "fail to GetNextAllActiveTasks Two")
 
-	return tasks, err
+	return tasks
 }
 
 //得到活动的任务（通过SQL）

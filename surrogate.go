@@ -17,8 +17,9 @@ type Surrogate struct {
 }
 
 //得到代理人（通过SQL）
-func GetSurrogateSQL(querystring string, args ...interface{}) ([]*Surrogate, error) {
+func GetSurrogateSQL(querystring string, args ...interface{}) []*Surrogate {
 	surrogates := make([]*Surrogate, 0)
 	err := orm.Where(querystring, args).Find(&surrogates)
-	return surrogates, err
+	PanicIf(err, "fail to GetSurrogateSQL")
+	return surrogates
 }

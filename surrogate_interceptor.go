@@ -10,7 +10,7 @@ func (p *SurrogateInterceptor) GetName() string {
 
 func (p *SurrogateInterceptor) Intercept(execution *Execution) {
 	for _, task := range execution.Tasks {
-		if actors, _ := task.GetTaskActors(); actors != nil {
+		if actors := task.GetTaskActors(); actors != nil {
 			for _, actor := range actors {
 				agent := GetSurrogate(actor.ActorId, execution.Process.Name)
 				if agent != actor.ActorId {

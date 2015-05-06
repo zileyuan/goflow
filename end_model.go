@@ -16,23 +16,24 @@ func (p *EndModel) Exec(execution *Execution) {
 
 	if order.ParentId == "" {
 		parentOrder := &Order{}
-		parentOrder.GetOrderById(order.ParentId)
+		if parentOrder.GetOrderById(order.ParentId) {
 
-		process := engine.GetProcessById(parentOrder.ProcessId)
+			process := engine.GetProcessById(parentOrder.ProcessId)
 
-		processModel := process.Model
-		spm := processModel.GetNode(order.ParentNodeName).(*SubProcessModel)
+			processModel := process.Model
+			spm := processModel.GetNode(order.ParentNodeName).(*SubProcessModel)
 
-		newExecution := &Execution{
-			Engine:       engine,
-			Process:      process,
-			Order:        parentOrder,
-			Args:         execution.Args,
-			ChildOrderId: order.Id,
-			Task:         execution.Task,
+			newExecution := &Execution{
+				Engine:       engine,
+				Process:      process,
+				Order:        parentOrder,
+				Args:         execution.Args,
+				ChildOrderId: order.Id,
+				Task:         execution.Task,
+			}
+			spm.Execute(newExecution)
+			execution.Tasks = append(execution.Tasks, newExecution.Tasks...)
 		}
-		spm.Execute(newExecution)
-		execution.Tasks = append(execution.Tasks, newExecution.Tasks...)
 	}
 }
 

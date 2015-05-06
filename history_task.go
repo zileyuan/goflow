@@ -21,10 +21,11 @@ type HistoryTask struct {
 }
 
 //根据ID得到HistoryTask
-func (p *HistoryTask) GetHistoryTaskById(id string) (bool, error) {
+func (p *HistoryTask) GetHistoryTaskById(id string) bool {
 	p.Id = id
 	success, err := orm.Get(p)
-	return success, err
+	PanicIf(err, "fail to GetHistoryTaskById")
+	return success
 }
 
 //通过HistoryTask生成Task

@@ -31,10 +31,11 @@ func (p *HistoryOrder) DataByOrder(order *Order) {
 }
 
 //根据ID得到HistoryOrder
-func (p *HistoryOrder) GetHistoryOrderById(id string) (bool, error) {
+func (p *HistoryOrder) GetHistoryOrderById(id string) bool {
 	p.Id = id
 	success, err := orm.Get(p)
-	return success, err
+	PanicIf(err, "fail to GetHistoryOrderById")
+	return success
 }
 
 //通过HistoryOrder生成Order

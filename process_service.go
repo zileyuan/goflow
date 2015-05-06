@@ -1,11 +1,6 @@
 package goflow
 
-import (
-	"fmt"
-	"time"
-
-	"github.com/lunny/log"
-)
+import "time"
 
 //流程服务
 type ProcessService struct {
@@ -75,7 +70,7 @@ func (p *ProcessService) Deploy(input []byte, creator string) string {
 	processModel.BuildRelationship(input, p)
 
 	ver := -1
-	oldProcess, _ := GetLatestProcess(processModel.Name)
+	oldProcess := GetLatestProcess(processModel.Name)
 	if oldProcess != nil {
 		ver = oldProcess.Version
 	}
@@ -98,36 +93,24 @@ func (p *ProcessService) Deploy(input []byte, creator string) string {
 //重新部署Process
 func (p *ProcessService) ReDeploy(id string, input []byte) {
 	process := &Process{}
-	success, err := process.GetProcessById(id)
-	if err != nil {
-		log.Errorf("error to get process by id %v", err)
-		panic(fmt.Errorf("error to get process by id!"))
-	}
+	success := process.GetProcessById(id)
 
 	if success {
 		process.Content = string(input)
 		p.Cache(process)
 		Update(process, process.Id)
-	} else {
-		log.Infof("fail to get process by id %v", err)
 	}
 }
 
 //卸载部署
 func (p *ProcessService) UnDeploy(id string) {
 	process := &Process{}
-	success, err := process.GetProcessById(id)
-	if err != nil {
-		log.Errorf("error to get process by id %v", err)
-		panic(fmt.Errorf("error to get process by id!"))
-	}
+	success := process.GetProcessById(id)
 
 	if success {
 		process.State = FS_FINISH
 		p.Cache(process)
 		Update(process, process.Id)
-	} else {
-		log.Infof("fail to get process by id %v", err)
 	}
 }
 
@@ -138,23 +121,29 @@ func (p *ProcessService) GetProcessById(id string) *Process {
 
 	if process == nil {
 		process = &Process{}
-		process.GetProcessById(id)
-		p.Cache(process)
+		if process.GetProcessById(id) {
+			p.Cache(process)
+			return process
+		} else {
+			return nil
+		}
+	} else {
+		return process
 	}
-	return process
 }
 
 //根据名称、版本得到Process
 func (p *ProcessService) GetProcessByVersion(name string, version int) *Process {
 	ver := version
 	if ver == -1 {
-		dbProcess, _ := GetLatestProcess(name)
+		dbProcess := GetLatestProcess(name)
 		if dbProcess == nil {
 			return nil
 		} else {
 			ver = dbProcess.Version
 		}
 	}
+
 	processName := name + DEFAULT_SEPARATOR + IntToStr(ver)
 	process := p.ProcessCache[processName]
 	if process == nil {
@@ -162,7 +151,7 @@ func (p *ProcessService) GetProcessByVersion(name string, version int) *Process 
 			Name:    name,
 			Version: ver,
 		}
-		success, _ := process.GetProcess()
+		success := process.GetProcess()
 		if success {
 			p.Cache(process)
 			return process

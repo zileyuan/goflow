@@ -17,8 +17,10 @@ var orm *xorm.Engine
 func InitAccessByXorm(xorm *xorm.Engine) {
 	orm = xorm
 	//orm.DumpAllToFile("./db_struct.sql")
-	orm.Sync2(new(HistoryOrder), new(HistoryTask), new(HistoryTaskActor),
+	err := orm.Sync2(new(HistoryOrder), new(HistoryTask), new(HistoryTaskActor),
 		new(Order), new(Process), new(Surrogate), new(Task), new(TaskActor), new(CCOrder))
+
+	PanicIf(err, "fail to sync tables")
 }
 
 //初始化数据库ORM引擎
@@ -34,10 +36,7 @@ func InitAccessByConfig(cfg string) {
 		orm, err = xorm.NewEngine(DbDriver, connString)
 		fmt.Printf(connString)
 
-		if err != nil {
-			log.Errorf("fail to init engine %v", err)
-			panic(fmt.Errorf("fail to init engine!"))
-		}
+		PanicIf(err, "fail to init engine")
 
 		orm.TZLocation = time.Local
 		orm.ShowSQL = true
@@ -51,41 +50,41 @@ func InitAccessByConfig(cfg string) {
 }
 
 //保存实体对象
-func Save(inf interface{}, id interface{}) error {
+func Save(inf interface{}, id interface{}) {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.InsertOne(inf)
 	t := reflect.TypeOf(inf)
+	PanicIf(err, "fail to insert %v %v", t, id)
 	log.Infof("%v %v inserted", t, id)
-	return err
 }
 
 //更新实体对象
-func Update(inf interface{}, id interface{}) error {
+func Update(inf interface{}, id interface{}) {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.Id(id).Update(inf)
 	t := reflect.TypeOf(inf)
+	PanicIf(err, "fail to update %v %v", t, id)
 	log.Infof("%v %v updated", t, id)
-	return err
 }
 
 //删除实体对象
-func Delete(inf interface{}, id interface{}) error {
+func Delete(inf interface{}, id interface{}) {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.Id(id).Delete(inf)
 	t := reflect.TypeOf(inf)
+	PanicIf(err, "fail to delete %v %v", t, id)
 	log.Infof("%v %v deleted", t, id)
-	return err
 }
 
 //删除实体对象
-func DeleteObj(inf interface{}) error {
+func DeleteObj(inf interface{}) {
 	session := orm.NewSession()
 	defer session.Close()
 	_, err := session.Delete(inf)
 	t := reflect.TypeOf(inf)
+	PanicIf(err, "fail to delete %v", t)
 	log.Info("%v deleted", t)
-	return err
 }

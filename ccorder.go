@@ -16,8 +16,9 @@ type CCOrder struct {
 	State      FLOW_STATUS `xorm:"tinyint"`                //流程实例状态
 }
 
-func GetCCOrder(orderId string, actorIds ...string) ([]*CCOrder, error) {
+func GetCCOrder(orderId string, actorIds ...string) []*CCOrder {
 	ccorders := make([]*CCOrder, 0)
 	err := orm.Where("OrderId = ? and ActorId in (?)", orderId, strings.Join(actorIds, ",")).Find(&ccorders)
-	return ccorders, err
+	PanicIf(err, "fail to GetCCOrder")
+	return ccorders
 }
