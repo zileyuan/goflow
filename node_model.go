@@ -4,6 +4,7 @@ import "strings"
 
 //XML节点通用信息
 type NodeModel struct {
+	INodeModel
 	BaseModel
 	Inputs                  []*TransitionModel `xml:"-"`                     //输入变迁集合
 	Outputs                 []*TransitionModel `xml:"transition"`            //输出变迁集合
@@ -11,6 +12,10 @@ type NodeModel struct {
 	PostInterceptorsSetting string             `xml:"postInterceptors,attr"` //局部后置拦截器
 	PrevInterceptors        []IInterceptor     `xml:"-"`                     //局部前置拦截器对象
 	PostInterceptors        []IInterceptor     `xml:"-"`                     //局部后置拦截器对象
+}
+
+func (p *NodeModel) GetName() string {
+	return p.BaseModel.Name
 }
 
 //执行

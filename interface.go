@@ -11,6 +11,7 @@ type INodeModel interface {
 	BuildInterceptors(processService *ProcessService)
 }
 
+//拦截器需要实现的接口
 type IInterceptor interface {
 	GetName() string //Unique
 	Intercept(execution *Execution)
