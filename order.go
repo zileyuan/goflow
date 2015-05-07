@@ -16,7 +16,7 @@ type Order struct {
 	LastUpdator    string    `xorm:"varchar(36)"`               //流程实例上一次更新人员ID
 	Priority       int       `xorm:"tinyint"`                   //流程实例优先级
 	OrderNo        string    `xorm:"varchar(100) index"`        //流程实例编号
-	Variable       string    `xorm:"varchar(2000)"`             //流程实例附属变量
+	Variable       string    `xorm:"varchar(3000)"`             //流程实例附属变量
 }
 
 //根据ID得到Order

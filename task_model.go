@@ -23,9 +23,20 @@ func (p *TaskModel) Exec(execution *Execution) {
 }
 
 //根据任务节点创建任务对象
-func CreateTaskHandle(tm *TaskModel, execution *Execution) {
+func CreateTaskHandle(tm *TaskModel, execution *Execution) []*Task {
 	tasks := CreateTask(tm, execution)
 	execution.Tasks = append(execution.Tasks, tasks...)
+
+	return tasks
+}
+
+//自动运行需要自动运行的任务
+func AutoExecuteTask(tm *TaskModel, execution *Execution, tasks []*Task) {
+	if tm.AutoExecute {
+		for _, task := range tasks {
+			execution.Engine.ExecuteTask(task.Id, string(ER_AUTO), execution.Args)
+		}
+	}
 }
 
 //合并任务角色的处理

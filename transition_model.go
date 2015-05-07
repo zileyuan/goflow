@@ -16,7 +16,8 @@ func (p *TransitionModel) Execute(execution *Execution) {
 		switch p.Target.(type) {
 		case *TaskModel:
 			taskModel := p.Target.(*TaskModel)
-			CreateTaskHandle(taskModel, execution)
+			tasks := CreateTaskHandle(taskModel, execution)
+			AutoExecuteTask(taskModel, execution, tasks)
 		case *SubProcessModel:
 			subProcessModel := p.Target.(*SubProcessModel)
 			StartSubProcessHandle(subProcessModel, execution)

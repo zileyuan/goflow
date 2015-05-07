@@ -134,6 +134,26 @@ func (p *Engine) ExecuteAndJumpTask(id string, operator string, args map[string]
 	return []*Task{}
 }
 
+//根据流程实例ID，操作人ID，参数列表按照节点模型model创建新的自由任务
+func (p *Engine) CreateFreeTask(orderId string, operator string, args map[string]interface{}, model *TaskModel) []*Task {
+	order := &Order{}
+	if order.GetOrderById(orderId) {
+		order.LastUpdator = operator
+		order.LastUpdateTime = time.Now()
+
+		process := p.GetProcessById(order.Id)
+		execution := &Execution{
+			Engine:   p,
+			Process:  process,
+			Order:    order,
+			Args:     args,
+			Operator: operator,
+		}
+		return CreateTask(model, execution)
+	}
+	return nil
+}
+
 //新建引擎
 func NewEngineByConfig(cfg string) *Engine {
 	InitAccessByConfig(cfg)
