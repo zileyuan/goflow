@@ -3,7 +3,7 @@ package goflow
 //特性的关键字
 const (
 	DEFAULT_SEPARATOR   = "."                                    //默认分割符
-	DEFAULT_KEY_ACTOR   = "S_ACTOR"                              //指定的actor
+	DEFAULT_KEY_ACTOR   = "s_actors"                             //指定的actors
 	DEFAULT_START_ID    = "00000000-0000-0000-0000-000000000000" //start node
 	ORDERNO_TIME_LAYOUT = "2006-01-02_15:04:05.000"              //OrderNo时间格式
 	STD_TIME_LAYOUT     = "2006-01-02 15:04:05"                  //标准时间格式

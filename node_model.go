@@ -13,6 +13,13 @@ type NodeModel struct {
 	PostInterceptors        []IInterceptor     `xml:"-"`                     //局部后置拦截器对象
 }
 
+//执行
+func (p *NodeModel) Execute(execution *Execution) {
+	p.PrevIntercept(execution)
+	p.Exec(execution)
+	p.PostIntercept(execution)
+}
+
 //建立拦截器
 func (p *NodeModel) BuildInterceptors(processService *ProcessService) {
 	p.PrevInterceptors = make([]IInterceptor, 0)

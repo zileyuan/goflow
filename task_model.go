@@ -10,6 +10,7 @@ type TaskModel struct {
 	ExpireTime  string       `xml:"expireTime,attr"`  //期望完成时间
 }
 
+//执行
 func (p *TaskModel) Exec(execution *Execution) {
 	if ProcessPerformType(p.PerformType) == PO_ANY {
 		p.RunOutTransition(execution)
@@ -19,14 +20,6 @@ func (p *TaskModel) Exec(execution *Execution) {
 			p.RunOutTransition(execution)
 		}
 	}
-}
-
-//执行
-func (p *TaskModel) Execute(execution *Execution) {
-	p.PrevIntercept(execution)
-	p.Exec(execution)
-	p.PostIntercept(execution)
-
 }
 
 //根据任务节点创建任务对象

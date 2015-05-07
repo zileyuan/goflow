@@ -11,18 +11,12 @@ func (p *JoinModel) MergeBranchHandle(execution *Execution) {
 	MergeHandle(execution, activeNodes)
 }
 
+//执行
 func (p *JoinModel) Exec(execution *Execution) {
 	p.MergeBranchHandle(execution)
 	if execution.IsMerged {
 		p.RunOutTransition(execution)
 	}
-}
-
-//执行
-func (p *JoinModel) Execute(execution *Execution) {
-	p.PrevIntercept(execution)
-	p.Exec(execution)
-	p.PostIntercept(execution)
 }
 
 //递归查找分叉节点

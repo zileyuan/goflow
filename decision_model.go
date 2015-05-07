@@ -8,6 +8,7 @@ type DecisionModel struct {
 	Expr string `xml:"expr,attr"` //决策的条件表达式
 }
 
+//执行
 func (p *DecisionModel) Exec(execution *Execution) {
 	var next interface{}
 	if p.Expr != "" {
@@ -30,11 +31,4 @@ func (p *DecisionModel) Exec(execution *Execution) {
 			}
 		}
 	}
-}
-
-//执行
-func (p *DecisionModel) Execute(execution *Execution) {
-	p.PrevIntercept(execution)
-	p.Exec(execution)
-	p.PostIntercept(execution)
 }

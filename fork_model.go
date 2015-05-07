@@ -6,8 +6,6 @@ type ForkModel struct {
 }
 
 //执行
-func (p *ForkModel) Execute(execution *Execution) {
-	p.PrevIntercept(execution)
+func (p *ForkModel) Exec(execution *Execution) {
 	p.RunOutTransition(execution)
-	p.PostIntercept(execution)
 }

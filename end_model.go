@@ -5,6 +5,7 @@ type EndModel struct {
 	NodeModel
 }
 
+//执行
 func (p *EndModel) Exec(execution *Execution) {
 	engine := execution.Engine
 	order := execution.Order
@@ -35,11 +36,4 @@ func (p *EndModel) Exec(execution *Execution) {
 			execution.Tasks = append(execution.Tasks, newExecution.Tasks...)
 		}
 	}
-}
-
-//执行
-func (p *EndModel) Execute(execution *Execution) {
-	p.PrevIntercept(execution)
-	p.Exec(execution)
-	p.PostIntercept(execution)
 }

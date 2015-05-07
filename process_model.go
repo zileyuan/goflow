@@ -34,24 +34,31 @@ func (p *ProcessModel) BuildRelationship(content []byte, processService *Process
 	//建立新的节点集合
 	p.Models = make([]INodeModel, 0)
 	for _, v := range p.StartNodes {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 	for _, v := range p.EndModels {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 	for _, v := range p.TaskModels {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 	for _, v := range p.DecisionModels {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 	for _, v := range p.ForkModels {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 	for _, v := range p.JoinModels {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 	for _, v := range p.SubProcessModels {
+		v.INodeModel = v
 		p.Models = append(p.Models, v)
 	}
 
