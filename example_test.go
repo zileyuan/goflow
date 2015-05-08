@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Knetic/govaluate"
+	_ "github.com/lib/pq"
 )
 
 //测试表达式

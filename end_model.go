@@ -15,7 +15,7 @@ func (p *EndModel) Exec(execution *Execution) {
 	}
 	CompleteOrder(order.Id)
 
-	if order.ParentId == "" {
+	if order.ParentId != "" {
 		parentOrder := &Order{}
 		if parentOrder.GetOrderById(order.ParentId) {
 
