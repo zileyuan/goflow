@@ -1,11 +1,9 @@
 package goflow
 
 import (
-	"os"
 	"time"
 
 	"github.com/go-xorm/xorm"
-	"github.com/lunny/log"
 )
 
 //GFLOW数据流引擎
@@ -168,10 +166,4 @@ func NewEngineByXorm(orm *xorm.Engine) *Engine {
 	engine := &Engine{}
 	engine.InitProcessService()
 	return engine
-}
-
-//初始化引擎
-func init() {
-	f, _ := os.Create("goflow.log")
-	log.Std.SetOutput(f)
 }

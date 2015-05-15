@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/bitly/go-simplejson"
-	"github.com/lunny/log"
 	"github.com/satori/go.uuid"
 )
 
@@ -35,7 +34,7 @@ func IntToStr(value int) string {
 func LoadXML(xmlFile string) []byte {
 	content, err := ioutil.ReadFile(xmlFile)
 	if err != nil {
-		log.Errorf("error to read xml file %v", err)
+		flowlog.Errorf("error to read xml file %v", err)
 		panic(fmt.Errorf("error to read xml file!"))
 	}
 	return content
@@ -114,7 +113,7 @@ func ProcessPerformType(performType PERFORM_TYPE) PERFORM_ORDER {
 //error处理
 func PanicIf(err error, format string, v ...interface{}) {
 	if err != nil {
-		log.Errorf(format+" [ %v ]", v, err)
+		flowlog.Errorf(format+" [ %v ]", v, err)
 		panic(err)
 	}
 }

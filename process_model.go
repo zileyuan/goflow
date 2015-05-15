@@ -4,8 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"strings"
-
-	"github.com/lunny/log"
 )
 
 //XML定义process节点元素
@@ -27,7 +25,7 @@ func (p *ProcessModel) BuildRelationship(content []byte, processService *Process
 	//解析xml内容
 	err := xml.Unmarshal(content, p)
 	if err != nil {
-		log.Errorf("error to unmarshal xml %v", err)
+		flowlog.Errorf("error to unmarshal xml %v", err)
 		panic(fmt.Errorf("error to unmarshal xml!"))
 	}
 

@@ -1,5 +1,13 @@
 package goflow
 
+import (
+	"os"
+
+	"github.com/lunny/log"
+)
+
+var flowlog = log.New(os.Stderr, "", log.Ldefault())
+
 //特性的关键字
 const (
 	DEFAULT_SEPARATOR   = "."                                    //默认分割符

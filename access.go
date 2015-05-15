@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
-	"github.com/lunny/log"
 )
 
 var orm *xorm.Engine
@@ -26,11 +25,11 @@ func InitAccessByXorm(xorm *xorm.Engine) {
 func InitAccessByConfig(cfg string) {
 	InitConfig(cfg)
 	if orm == nil {
-		log.Info(DbDriverConnstr)
+		flowlog.Info(DbDriverConnstr)
 		connString := fmt.Sprintf(DbDriverConnstr, DbUsername, DbPassword,
 			DbServer, DbPort, DbDatebase)
 
-		log.Info(connString)
+		flowlog.Info(connString)
 		var err error
 		orm, err = xorm.NewEngine(DbDriver, connString)
 		fmt.Printf(connString)
@@ -55,7 +54,7 @@ func Save(inf interface{}, id interface{}) {
 	_, err := session.InsertOne(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to insert %v %v", t, id)
-	log.Infof("%v %v inserted", t, id)
+	flowlog.Infof("%v %v inserted", t, id)
 }
 
 //更新实体对象
@@ -65,7 +64,7 @@ func Update(inf interface{}, id interface{}) {
 	_, err := session.Id(id).Update(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to update %v %v", t, id)
-	log.Infof("%v %v updated", t, id)
+	flowlog.Infof("%v %v updated", t, id)
 }
 
 //删除实体对象
@@ -75,7 +74,7 @@ func Delete(inf interface{}, id interface{}) {
 	_, err := session.Id(id).Delete(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to delete %v %v", t, id)
-	log.Infof("%v %v deleted", t, id)
+	flowlog.Infof("%v %v deleted", t, id)
 }
 
 //删除实体对象
@@ -85,5 +84,5 @@ func DeleteObj(inf interface{}) {
 	_, err := session.Delete(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to delete %v", t)
-	log.Info("%v deleted", t)
+	flowlog.Info("%v deleted", t)
 }
