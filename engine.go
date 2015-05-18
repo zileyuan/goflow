@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/go-xorm/xorm"
+	"github.com/lunny/log"
 )
 
 //GFLOW数据流引擎
@@ -166,4 +167,13 @@ func NewEngineByXorm(orm *xorm.Engine) *Engine {
 	engine := &Engine{}
 	engine.InitProcessService()
 	return engine
+}
+
+//初始化LOG
+func init() {
+	w := log.NewFileWriter(log.FileOptions{
+		ByType: log.ByDay,
+		Dir:    "./flowlogs",
+	})
+	flowlog.SetOutput(w)
 }

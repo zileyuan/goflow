@@ -389,7 +389,7 @@ func TerminateOrder(id string, operator string) {
 func GetSurrogate(operator string, processName string) string {
 	var result []string
 	now := time.Now()
-	surrogates := GetSurrogateSQL("State = ? and StartTime =< ?  and EndTime >= ? and Operator in (?) and ProcessName in (?)", SS_ENABLE, now, now, operator, processName)
+	surrogates := GetSurrogateSQL(`"State" = ? and "StartTime" =< ?  and "EndTime" >= ? and "Operator" in (?) and "ProcessName" in (?)`, SS_ENABLE, now, now, operator, processName)
 	for _, surrogate := range surrogates {
 		result = append(result, surrogate.Surrogate)
 	}

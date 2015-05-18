@@ -88,7 +88,7 @@ func GetNextAllActiveTasks(orderId string, taskName string, parentTaskId string)
 		ids = append(ids, historyTask.Id)
 	}
 	tasks := make([]*Task, 0)
-	err = orm.Where("ParentTaskId in (?)", strings.Join(ids, ",")).Find(&tasks)
+	err = orm.Where(`"ParentTaskId" in (?)`, strings.Join(ids, ",")).Find(&tasks)
 	PanicIf(err, "fail to GetNextAllActiveTasks Two")
 
 	return tasks

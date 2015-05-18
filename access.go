@@ -49,9 +49,7 @@ func InitAccessByConfig(cfg string) {
 
 //保存实体对象
 func Save(inf interface{}, id interface{}) {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.InsertOne(inf)
+	_, err := orm.InsertOne(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to insert %v %v", t, id)
 	flowlog.Infof("%v %v inserted", t, id)
@@ -59,9 +57,7 @@ func Save(inf interface{}, id interface{}) {
 
 //更新实体对象
 func Update(inf interface{}, id interface{}) {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(id).Update(inf)
+	_, err := orm.Id(id).Update(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to update %v %v", t, id)
 	flowlog.Infof("%v %v updated", t, id)
@@ -69,9 +65,7 @@ func Update(inf interface{}, id interface{}) {
 
 //删除实体对象
 func Delete(inf interface{}, id interface{}) {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Id(id).Delete(inf)
+	_, err := orm.Id(id).Delete(nil)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to delete %v %v", t, id)
 	flowlog.Infof("%v %v deleted", t, id)
@@ -79,9 +73,7 @@ func Delete(inf interface{}, id interface{}) {
 
 //删除实体对象
 func DeleteObj(inf interface{}) {
-	session := orm.NewSession()
-	defer session.Close()
-	_, err := session.Delete(inf)
+	_, err := orm.Delete(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to delete %v", t)
 	flowlog.Info("%v deleted", t)

@@ -18,7 +18,7 @@ type CCOrder struct {
 
 func GetCCOrder(orderId string, actorIds ...string) []*CCOrder {
 	ccorders := make([]*CCOrder, 0)
-	err := orm.Where("OrderId = ? and ActorId in (?)", orderId, strings.Join(actorIds, ",")).Find(&ccorders)
+	err := orm.Where(`"OrderId" = ? and "ActorId" in (?)`, orderId, strings.Join(actorIds, ",")).Find(&ccorders)
 	PanicIf(err, "fail to GetCCOrder")
 	return ccorders
 }

@@ -2,18 +2,11 @@ package goflow
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/Knetic/govaluate"
 	_ "github.com/lib/pq"
 )
-
-//初始化LOG
-func init() {
-	f, _ := os.Create("goflow.log")
-	flowlog.SetOutput(f)
-}
 
 //测试表达式
 func TestExpression(t *testing.T) {

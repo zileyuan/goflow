@@ -95,13 +95,13 @@ func MergeHandle(execution *Execution, activeNodes []string) {
 
 	isSubProcessMerged := false
 	if processModel.ContainsSubProcessNodeNames(activeNodes...) {
-		orders := GetActiveOrdersSQL("ParentId = ? and Id <> ?", execution.Order.Id, execution.ChildOrderId)
+		orders := GetActiveOrdersSQL(`"ParentId" = ? and "Id" <> ?`, execution.Order.Id, execution.ChildOrderId)
 		isSubProcessMerged = len(orders) == 0
 	}
 
 	isTaskMerged := false
 	if isSubProcessMerged && processModel.ContainsTaskNodeNames(activeNodes...) {
-		tasks, _ := GetActiveTasksSQL("OrderId = ? and Id <> ? and Name in (?)", execution.Order.Id, execution.Task.Id, strings.Join(activeNodes, ","))
+		tasks, _ := GetActiveTasksSQL(`"OrderId" = ? and "Id" <> ? and "Name" in (?)`, execution.Order.Id, execution.Task.Id, strings.Join(activeNodes, ","))
 		isTaskMerged = len(tasks) == 0
 	}
 	execution.IsMerged = isSubProcessMerged && isTaskMerged
