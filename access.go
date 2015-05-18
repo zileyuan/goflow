@@ -65,7 +65,7 @@ func Update(inf interface{}, id interface{}) {
 
 //删除实体对象
 func Delete(inf interface{}, id interface{}) {
-	_, err := orm.Id(id).Delete(nil)
+	_, err := orm.Id(id).Delete(inf)
 	t := reflect.TypeOf(inf)
 	PanicIf(err, "fail to delete %v %v", t, id)
 	flowlog.Infof("%v %v deleted", t, id)
