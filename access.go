@@ -36,6 +36,9 @@ func InitAccessByConfig(cfg string) {
 
 		PanicIf(err, "fail to init engine")
 
+		orm.SetMaxIdleConns(MaxIdleConns)
+		orm.SetMaxOpenConns(MaxOpenConns)
+
 		orm.TZLocation = time.Local
 		orm.ShowSQL = true
 

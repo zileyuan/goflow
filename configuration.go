@@ -16,6 +16,8 @@ var (
 	DbServer        string
 	DbPort          int
 	DbDatebase      string
+	MaxIdleConns    int
+	MaxOpenConns    int
 )
 
 //系统配置文件初始化（包含运行模式和数据库）
@@ -35,5 +37,7 @@ func InitConfig(cfg string) {
 		DbServer = Cfg.MustValue(RunMode, "db_server")
 		DbDatebase = Cfg.MustValue(RunMode, "db_datebase")
 		DbPort = Cfg.MustInt(RunMode, "db_port")
+		MaxIdleConns = Cfg.MustInt(RunMode, "max_idle_conns")
+		MaxOpenConns = Cfg.MustInt(RunMode, "max_open_conns")
 	}
 }
